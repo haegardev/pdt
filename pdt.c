@@ -29,12 +29,16 @@ void* xalloc(pdt_t* pdt, size_t nmemb, size_t size)
 
 void parse_line_record(pdt_t* pdt, char* line, ssize_t nread)
 {
+
     pdt->line_counter++;
     if (nread  <= 1) {
         pdt->last_skipped_line = pdt->line_counter;
         pdt->erno = ERROR_PARSING;
         return;
     }
+    /* Skip comments */
+    if (line[0] == '#')
+        return;
     fwrite(line,nread,1,stdout);
 }
 
