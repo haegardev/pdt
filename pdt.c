@@ -5,10 +5,13 @@
 
 #define LINESZ 4096
 #define EMSGSZ 4096
+#define ERROR_PARSING 1
 
 typedef struct pdt {
     uint8_t erno;
     char emsg [EMSGSZ];
+    uint32_t last_skipped_line;
+    uint32_t line_counter;
     //TODO add other generic stuff here
 } pdt_t;
 
@@ -26,6 +29,12 @@ void* xalloc(pdt_t* pdt, size_t nmemb, size_t size)
 
 void parse_line_record(pdt_t* pdt, char* line, ssize_t nread)
 {
+    pdt->line_counter++;
+    if (nread  <= 1) {
+        pdt->last_skipped_line = pdt->line_counter;
+        pdt->erno = ERROR_PARSING;
+        return;
+    }
     fwrite(line,nread,1,stdout);
 }
 
