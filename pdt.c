@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
 {
     const char* const short_options = "hr:";
     const struct option long_options[] = {
-        { "help",0, NULL, 'h'},
-        { "read",0, NULL, 'r'},
+        { "help",no_argument, NULL, 'h'},
+        { "read",required_argument, NULL, 'r'},
         { NULL, 0, NULL, 0}
     };
     int next_option;
