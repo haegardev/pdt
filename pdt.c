@@ -29,7 +29,8 @@ void* xalloc(pdt_t* pdt, size_t nmemb, size_t size)
 
 void parse_line_record(pdt_t* pdt, char* line, ssize_t nread)
 {
-
+    int i =0;
+    int found = -1;
     pdt->line_counter++;
     if (nread  <= 1) {
         pdt->last_skipped_line = pdt->line_counter;
@@ -40,6 +41,15 @@ void parse_line_record(pdt_t* pdt, char* line, ssize_t nread)
     if (line[0] == '#')
         return;
     fwrite(line,nread,1,stdout);
+    for (i = 0; i<nread; ++i) {
+        if (line[i] == '|') {
+            found = i;
+            break;
+       }
+    }
+    if (found > 0) {
+        printf("todo parse IP and ports\n");
+    }
 }
 
 void read_text_profile(pdt_t* pdt, char* filename)
