@@ -1,0 +1,4 @@
+Profile examples
+
+- Integer linked with a time series of observations
+- Integer linked with a set of other integers
