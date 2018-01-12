@@ -1,0 +1,100 @@
+#!/usr/bin/python3
+import gzip
+import sys
+import pprint
+import redis
+import os
+import argparse
+
+class ProcessWords:
+    def __init__(self, minlen=4):
+        self.words = dict()
+        self.minlen = minlen
+    def count_digits(self, hist):
+        dcount = 0
+        for ch in hist.keys():
+            #Count digits
+            if (ch >= 48 and ch <=57):
+                dcount+=hist[ch]
+        return dcount
+
+    #skip characters such as < > etc
+    def discard_na(self,hist):
+        for ch in hist.keys():
+            if ch < 63:
+                #print ("DEBUG < 63")
+                #allow some characters such as spaces and tabs
+                if ch == 32 or ch == 9:
+                    continue
+                return True
+            if ch >= 91 and ch <= 96:
+                #print ("DEBUG  >= 91 and <=96")
+                return True
+            if ch >= 123 and ch <= 127:
+                #print ("DEBUG > 123 and < 127")
+                return True
+        return False
+
+    #Want at least n different characters
+    def num_chars(self,hist):
+        if len(hist.keys()) <=3:
+            return True
+        return False
+  
+    def compute_char_histo(self,line):
+        out = dict()
+        #Bytes are returned as ints
+        for ch in line:
+            if not ch in out:
+                out[ch] = 0
+            out[ch]+=1
+        return out
+
+    def process(self,filename):
+        f = gzip.open(filename)
+        for line in f.readlines():
+            line = line[:-1]
+            #Skip small words 
+            if len(line) <= self.minlen:
+                continue
+            hist = self.compute_char_histo(line)
+            #Focus on word subset of the ascii alphabet
+            if self.discard_na(hist):
+                continue
+            if self.num_chars(hist):
+                continue
+            if line not in self.words:
+                self.words[line] = 0
+            self.words[line] += 1
+
+    def dump_words(self):
+        for w in self.words.keys():
+            print (w)
+
+    def index_redis(self,red, filename):
+        #The filenames including the words must be identified
+        #Create a ranked set of words per file
+        key = os.path.basename(filename)
+        for w in self.words:
+            freq = self.words[w]
+            red.zincrby(key,w,freq)
+
+parser = argparse.ArgumentParser(description="Process words")
+parser.add_argument("--filename", type=str, nargs=1, required=True)
+parser.add_argument("--socket", type=str)
+parser.add_argument("--words", action='store_true')
+parser.add_argument("--length",type=int,required=False)
+
+args = parser.parse_args()
+obj = ProcessWords()
+if args.length:
+    obj.minlen = args.length 
+
+obj.process(args.filename[0])
+
+if args.socket:
+    red = redis.Redis(unix_socket_path=args.socket[0])
+    obj.index_redis(red,args.filename[0])
+
+if args.words:
+    obj.dump_words()
