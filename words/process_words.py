@@ -93,7 +93,7 @@ if args.length:
 obj.process(args.filename[0])
 
 if args.socket:
-    red = redis.Redis(unix_socket_path=args.socket[0])
+    red = redis.Redis(unix_socket_path=args.socket)
     obj.index_redis(red,args.filename[0])
 
 if args.words:
