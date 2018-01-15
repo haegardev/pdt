@@ -79,6 +79,18 @@ class ProcessWords:
             freq = self.words[w]
             red.zincrby(key,w,freq)
 
+    def guess_day(self, filename):
+        #Skip all file extensions based on ."
+        u = filename.split(".")
+        t = u[0].split("-")
+        for i in t:
+            try:
+                num = int(i)
+                if len(i) == 14:
+                    i = i[0:8]
+                    return i
+            except ValueError as e:
+                pass
 parser = argparse.ArgumentParser(description="Process words")
 parser.add_argument("--filename", type=str, nargs=1, required=True)
 parser.add_argument("--socket", type=str)
@@ -98,6 +110,7 @@ if args.socket:
         sys.exit(1)
     else:
         red.sadd("WORDFILES", fn)
+    day = obj.guess_day(args.filename[0])
 
 obj.process(args.filename[0])
 
