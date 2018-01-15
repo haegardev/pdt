@@ -92,6 +92,12 @@ if args.length:
 
 if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
+    fn = os.path.basename(args.filename[0])
+    if red.sismember("WORDFILES", fn):
+        sys.stderr.write("Processed already "+ fn + "\n")
+        sys.exit(1)
+    else:
+        red.sadd("WORDFILES", fn)
 
 obj.process(args.filename[0])
 
