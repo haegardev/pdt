@@ -90,10 +90,12 @@ obj = ProcessWords()
 if args.length:
     obj.minlen = args.length 
 
+if args.socket:
+    red = redis.Redis(unix_socket_path=args.socket)
+
 obj.process(args.filename[0])
 
 if args.socket:
-    red = redis.Redis(unix_socket_path=args.socket)
     obj.index_redis(red,args.filename[0])
 
 if args.words:
