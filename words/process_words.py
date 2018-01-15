@@ -72,9 +72,7 @@ class ProcessWords:
             print (w)
 
     def index_redis(self,red, filename):
-        #The filenames including the words must be identified
-        #Create a ranked set of words per file
-        key = os.path.basename(filename)
+        key = filename
         for w in self.words:
             freq = self.words[w]
             red.zincrby(key,w,freq)
@@ -115,7 +113,7 @@ if args.socket:
 obj.process(args.filename[0])
 
 if args.socket:
-    obj.index_redis(red,args.filename[0])
+    obj.index_redis(red,day)
 
 if args.words:
     obj.dump_words()
