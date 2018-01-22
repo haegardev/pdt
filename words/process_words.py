@@ -102,6 +102,7 @@ parser.add_argument("--socket", type=str)
 parser.add_argument("--words", action='store_true')
 parser.add_argument("--length",type=int,required = False)
 parser.add_argument("--key", type=str, nargs=1, required = False)
+parser.add_argument("--remove", action='store_true',required = False)
 
 args = parser.parse_args()
 obj = ProcessWords()
@@ -111,6 +112,9 @@ if args.length:
 if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
     if args.key:
+        if args.remove:
+            print ("Remove items from the inspection list")
+            sys.exit(0)
         obj.inspect_redis_key(red,args.key[0])
         sys.exit(0)
     fn = os.path.basename(args.filename[0])
