@@ -96,6 +96,10 @@ class ProcessWords:
                 print (k.decode("ascii"))
         red.zunionstore("INSPECTED", [keyname])
 
+    def remove_redis_key(self, red, keyname):
+        for (k,v) in red.zrevrange(keyname, 0, -1, 'withscores'):
+            red.zrem("INSPECTED", k)
+
 parser = argparse.ArgumentParser(description="Process words")
 parser.add_argument("--filename", type=str, nargs=1, required=False)
 parser.add_argument("--socket", type=str)
@@ -113,7 +117,7 @@ if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
     if args.key:
         if args.remove:
-            print ("Remove items from the inspection list")
+            obj.remove_redis_key(red, args.key[0])
             sys.exit(0)
         obj.inspect_redis_key(red,args.key[0])
         sys.exit(0)
