@@ -99,7 +99,7 @@ class ProcessWords:
                     continue
                 print (k.decode("ascii"))
         if self.dryrun == False:
-            red.zunionstore("INSPECTED", [keyname])
+            red.zunionstore("INSPECTED", ["INSPECTED", keyname])
 
     def remove_redis_key(self, red, keyname):
         for (k,v) in red.zrevrange(keyname, 0, -1, 'withscores'):
