@@ -11,6 +11,8 @@ class ProcessWords:
         self.words = dict()
         self.minlen = minlen
         self.dryrun = False
+        #Skip all words having more than <repeat> characters
+        self.repeat = sys.maxsize
 
     def count_digits(self, hist):
         dcount = 0
@@ -92,11 +94,22 @@ class ProcessWords:
             except ValueError as e:
                 pass
 
+    def check_repetive(self, histo):
+        for ch in histo.keys():
+            if histo[ch] > self.repeat:
+                return True
+        return False
+
     def inspect_redis_key(self,red,keyname):
         for (k,v) in red.zrevrange(keyname,0,-1, 'withscores'):
             if red.zscore("INSPECTED",k) is None:
                 if len(k) <= self.minlen:
                     continue
+                h = self.compute_char_histo(k)
+                #very slow
+                if  self.repeat < sys.maxsize:
+                    if self.check_repetive(h) == True:
+                        continue
                 print (k.decode("ascii"))
         if self.dryrun == False:
             red.zunionstore("INSPECTED", ["INSPECTED", keyname])
@@ -117,6 +130,7 @@ parser.add_argument("--key", type=str, nargs=1, required = False)
 parser.add_argument("--remove", action='store_true',required = False)
 parser.add_argument("--reset", action='store_true', required = False)
 parser.add_argument("--dry", action='store_true', required = False)
+parser.add_argument("--repeat", type=int, nargs=1, required = False)
 
 args = parser.parse_args()
 obj = ProcessWords()
@@ -125,6 +139,9 @@ if args.length:
 
 if args.dry:
     obj.dryrun = True
+
+if args.repeat:
+    obj.repeat = args.repeat[0]
 
 if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
