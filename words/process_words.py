@@ -91,9 +91,10 @@ class ProcessWords:
                 pass
 
     def inspect_redis_key(self,red,keyname):
-        #TODO intersection with blacklist
         for (k,v) in red.zrevrange(keyname,0,-1, 'withscores'):
-            print (k)
+            if red.zscore("INSPECTED",k) is None:
+                print (k.decode("ascii"))
+        red.zunionstore("INSPECTED", [keyname])
 
 parser = argparse.ArgumentParser(description="Process words")
 parser.add_argument("--filename", type=str, nargs=1, required=False)
