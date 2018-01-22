@@ -89,11 +89,18 @@ class ProcessWords:
                     return i
             except ValueError as e:
                 pass
+
+    def inspect_redis_key(self,red,keyname):
+        #TODO intersection with blacklist
+        for (k,v) in red.zrevrange(keyname,0,-1, 'withscores'):
+            print (k)
+
 parser = argparse.ArgumentParser(description="Process words")
-parser.add_argument("--filename", type=str, nargs=1, required=True)
+parser.add_argument("--filename", type=str, nargs=1, required=False)
 parser.add_argument("--socket", type=str)
 parser.add_argument("--words", action='store_true')
-parser.add_argument("--length",type=int,required=False)
+parser.add_argument("--length",type=int,required = False)
+parser.add_argument("--key", type=str, nargs=1, required = False)
 
 args = parser.parse_args()
 obj = ProcessWords()
@@ -102,6 +109,9 @@ if args.length:
 
 if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
+    if args.key:
+        obj.inspect_redis_key(red,args.key[0])
+        sys.exit(0)
     fn = os.path.basename(args.filename[0])
     if red.sismember("WORDFILES", fn):
         sys.stderr.write("Processed already "+ fn + "\n")
