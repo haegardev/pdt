@@ -100,6 +100,9 @@ class ProcessWords:
         for (k,v) in red.zrevrange(keyname, 0, -1, 'withscores'):
             red.zrem("INSPECTED", k)
 
+    def reset_inspections(self,red):
+        red.delete("INSPECTED")
+
 parser = argparse.ArgumentParser(description="Process words")
 parser.add_argument("--filename", type=str, nargs=1, required=False)
 parser.add_argument("--socket", type=str)
@@ -107,6 +110,7 @@ parser.add_argument("--words", action='store_true')
 parser.add_argument("--length",type=int,required = False)
 parser.add_argument("--key", type=str, nargs=1, required = False)
 parser.add_argument("--remove", action='store_true',required = False)
+parser.add_argument("--reset", action='store_true', required = False)
 
 args = parser.parse_args()
 obj = ProcessWords()
@@ -115,6 +119,9 @@ if args.length:
 
 if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
+    if args.reset:
+        obj.reset_inspections(red)
+        sys.exit(1)
     if args.key:
         if args.remove:
             obj.remove_redis_key(red, args.key[0])
