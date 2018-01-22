@@ -93,6 +93,8 @@ class ProcessWords:
     def inspect_redis_key(self,red,keyname):
         for (k,v) in red.zrevrange(keyname,0,-1, 'withscores'):
             if red.zscore("INSPECTED",k) is None:
+                if len(k) <= self.minlen:
+                    continue
                 print (k.decode("ascii"))
         red.zunionstore("INSPECTED", [keyname])
 
