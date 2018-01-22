@@ -10,6 +10,8 @@ class ProcessWords:
     def __init__(self, minlen=4):
         self.words = dict()
         self.minlen = minlen
+        self.dryrun = False
+
     def count_digits(self, hist):
         dcount = 0
         for ch in hist.keys():
@@ -96,7 +98,8 @@ class ProcessWords:
                 if len(k) <= self.minlen:
                     continue
                 print (k.decode("ascii"))
-        red.zunionstore("INSPECTED", [keyname])
+        if self.dryrun == False:
+            red.zunionstore("INSPECTED", [keyname])
 
     def remove_redis_key(self, red, keyname):
         for (k,v) in red.zrevrange(keyname, 0, -1, 'withscores'):
@@ -113,11 +116,15 @@ parser.add_argument("--length",type=int,required = False)
 parser.add_argument("--key", type=str, nargs=1, required = False)
 parser.add_argument("--remove", action='store_true',required = False)
 parser.add_argument("--reset", action='store_true', required = False)
+parser.add_argument("--dry", action='store_true', required = False)
 
 args = parser.parse_args()
 obj = ProcessWords()
 if args.length:
     obj.minlen = args.length 
+
+if args.dry:
+    obj.dryrun = True
 
 if args.socket:
     red = redis.Redis(unix_socket_path=args.socket)
