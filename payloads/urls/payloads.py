@@ -21,9 +21,18 @@ class Payloads:
          """
         self.cur.execute(sql)
 
+    def get_timestamp(self, directory):
+        #FIXME Get the download timestamp from filesystem
+        #get it from somewhere else as it is error prone
+        return int(os.stat(d).st_ctime)
+
+    #TODO modify download script to add source ip, timestamp, source ip
+    #in metadata file
+
     def update_index(self):
         for uuid in os.listdir(self.repository):
-            print (uuid)
+            d = self.repository + os.sep + uuid
+            ts = self.get_timestamp(d)
 
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
