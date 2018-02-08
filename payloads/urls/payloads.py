@@ -16,6 +16,7 @@ class Payloads:
                                      uid TEXT);
          """
         cur.execute(sql)
+        con.close()
 
     def update_index(self, database, repository):
         for uuid in os.listdir(repository):
