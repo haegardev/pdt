@@ -4,9 +4,13 @@ import argparse
 import os
 
 class Payloads:
-    def create_new_index(self, database):
-        con = sqlite3.connect(database)
-        cur = con.cursor()
+    def __init__(self, database, repository):
+        self.database = database
+        self.repository = repository
+        self.con = sqlite3.connect(database)
+        self.cur = self.con.cursor()
+
+    def create_new_index(self):
         sql = """ CREATE TABLE payloads (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                      ts DATETIME,
                                      source_ip INTEGER,
@@ -15,22 +19,22 @@ class Payloads:
                                      sha1 TEXT,
                                      uid TEXT);
          """
-        cur.execute(sql)
-        con.close()
+        self.cur.execute(sql)
 
-    def update_index(self, database, repository):
-        for uuid in os.listdir(repository):
+    def update_index(self):
+        for uuid in os.listdir(self.repository):
             print (uuid)
 
-obj = Payloads()
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
-parser.add_argument("--repository", type=str, nargs=1, required=False)
+parser.add_argument("--repository", type=str, nargs=1, required=True)
 parser.add_argument("--database", type=str, nargs=1, required=True)
 args = parser.parse_args()
 
-if args.create:
-    obj.create_new_index(args.database[0])
+obj = Payloads(args.database[0], args.repository[0])
 
-obj.update_index(args.database[0], args.repository[0])
+if args.create:
+    obj.create_new_index()
+
+obj.update_index()
