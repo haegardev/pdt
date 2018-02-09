@@ -3,6 +3,7 @@ import sqlite3
 import argparse
 import os
 import hashlib
+import sys
 
 class Payloads:
     def __init__(self, database, repository):
@@ -58,15 +59,25 @@ class Payloads:
             url = url[:-1]
         return url
 
+    def print_hashes(self):
+        for (sha1,uid) in self.cur.execute("SELECT sha1,uid FROM payloads WHERE length > 0 ORDER BY uid"):
+            fn = self.repository + os.sep +  uid +  os.sep + "stage1.dat"
+            print (sha1,fn)
+
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
 parser.add_argument("--repository", type=str, nargs=1, required=True)
 parser.add_argument("--database", type=str, nargs=1, required=True)
+parser.add_argument("--hashes", action="store_true")
+
 args = parser.parse_args()
 
 obj = Payloads(args.database[0], args.repository[0])
 
 if args.create:
     obj.create_new_index()
+if args.hashes:
+    obj.print_hashes()
+    sys.exit(0)
 
 obj.update_index()
