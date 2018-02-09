@@ -29,7 +29,6 @@ class Payloads:
         return int(os.stat(directory).st_ctime)
 
     def compute_hash(self, filename):
-        print ("Test "+filename)
         m = hashlib.sha1()
         with open(filename,"rb") as f:
             m.update(f.read())
@@ -46,7 +45,10 @@ class Payloads:
             #TODO Record file size aswell
             stage1 = self.repository + os.sep + uuid + os.sep + "stage1.dat"
             h = self.compute_hash(stage1)
-            print (ts,url,h)
+            l = int(os.stat(stage1).st_size)
+            self.cur.execute("INSERT INTO payloads (ts, url, sha1,\
+                uid, length) VALUES (?,?,?,?,?)",[ts,url,h,uuid,l])
+        self.con.commit()
 
     def fetch_url(self,uuid):
         fn = self.repository + os.sep + uuid + os.sep + "stage1.url"
