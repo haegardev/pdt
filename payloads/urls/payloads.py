@@ -2,6 +2,7 @@
 import sqlite3
 import argparse
 import os
+import hashlib
 
 class Payloads:
     def __init__(self, database, repository):
@@ -26,6 +27,13 @@ class Payloads:
         #get it from somewhere else as it is error prone
         return int(os.stat(directory).st_ctime)
 
+    def compute_hash(self, filename):
+        print ("Test "+filename)
+        m = hashlib.sha1()
+        with open(filename,"rb") as f:
+            m.update(f.read())
+        return m.hexdigest()
+
     #TODO modify download script to add source ip, timestamp, source ip
     #in metadata file
 
@@ -34,7 +42,10 @@ class Payloads:
             d = self.repository + os.sep + uuid
             ts = self.get_timestamp(d)
             url = self.fetch_url(uuid)
-            print (ts,url)
+            #TODO Record file size aswell
+            stage1 = self.repository + os.sep + uuid + os.sep + "stage1.dat"
+            h = self.compute_hash(stage1)
+            print (ts,url,h)
 
     def fetch_url(self,uuid):
         fn = self.repository + os.sep + uuid + os.sep + "stage1.url"
