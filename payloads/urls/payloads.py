@@ -60,7 +60,7 @@ class Payloads:
         return url
 
     def print_hashes(self):
-        for (sha1,uid) in self.cur.execute("SELECT sha1,uid FROM payloads WHERE length > 0 ORDER BY uid"):
+        for (sha1,uid) in self.cur.execute("SELECT sha1,uid FROM payloads WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             fn = self.repository + os.sep +  uid +  os.sep + "stage1.dat"
             print (sha1,fn)
 
