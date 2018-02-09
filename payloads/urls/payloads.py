@@ -64,12 +64,21 @@ class Payloads:
             fn = self.repository + os.sep +  uid +  os.sep + "stage1.dat"
             print (sha1,fn)
 
+    def duplicate_info(self):
+        print ("#uid,sha1,count")
+        for (uid,sha1,count) in self.cur.execute("SELECT uid,sha1,COUNT(*) \
+                                from payloads where length > 0 group by sha1 \
+                                having count(*) > 1 order by count(*) desc;"):
+            print (uid,sha1,count)
+
+
+
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
 parser.add_argument("--repository", type=str, nargs=1, required=True)
 parser.add_argument("--database", type=str, nargs=1, required=True)
 parser.add_argument("--hashes", action="store_true")
-
+parser.add_argument("--duplicates", action="store_true")
 args = parser.parse_args()
 
 obj = Payloads(args.database[0], args.repository[0])
@@ -78,6 +87,10 @@ if args.create:
     obj.create_new_index()
 if args.hashes:
     obj.print_hashes()
+    sys.exit(0)
+
+if args.duplicates:
+    obj.duplicate_info()
     sys.exit(0)
 
 obj.update_index()
