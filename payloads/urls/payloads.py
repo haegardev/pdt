@@ -24,7 +24,7 @@ class Payloads:
     def get_timestamp(self, directory):
         #FIXME Get the download timestamp from filesystem
         #get it from somewhere else as it is error prone
-        return int(os.stat(d).st_ctime)
+        return int(os.stat(directory).st_ctime)
 
     #TODO modify download script to add source ip, timestamp, source ip
     #in metadata file
@@ -33,7 +33,16 @@ class Payloads:
         for uuid in os.listdir(self.repository):
             d = self.repository + os.sep + uuid
             ts = self.get_timestamp(d)
+            url = self.fetch_url(uuid)
+            print (ts,url)
 
+    def fetch_url(self,uuid):
+        fn = self.repository + os.sep + uuid + os.sep + "stage1.url"
+        url = None
+        with open(fn, "r") as f:
+            url = f.readline()
+            url = url[:-1]
+        return url
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
