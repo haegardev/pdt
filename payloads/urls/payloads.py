@@ -23,6 +23,13 @@ class Payloads:
                                      length INTEGER);
          """
         self.cur.execute(sql)
+        sql = """ CREATE TABLE stage2 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                       ts DATETIME,
+                                       uuid TEXT UNIQUE,
+                                       sha1 TEXT,
+                                       length INTEGER);
+             """
+        self.cur.execute(sql)
 
     def get_timestamp(self, directory):
         #FIXME Get the download timestamp from filesystem
