@@ -71,13 +71,17 @@ class Payloads:
                                 HAVING COUNT(*) > 1 ORDER BY COUNT(*) DESC;"):
             print (uid,sha1,count)
 
+    def query_uid(self, sha1):
+        for (uid,sha1) in self.cur.execute("SELECT uid,sha1 FROM payloads WHERE sha1 = ? ",[sha1]):
+            print (self.repository + os.sep + uid + os.sep + "stage1.dat")
+
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
 parser.add_argument("--repository", type=str, nargs=1, required=True)
 parser.add_argument("--database", type=str, nargs=1, required=True)
 parser.add_argument("--hashes", action="store_true")
 parser.add_argument("--duplicates", action="store_true")
-parser.add_argument("--uid", action="store_true")
+parser.add_argument("--uid", type=str, nargs=1, required=False)
 
 args = parser.parse_args()
 
@@ -93,4 +97,7 @@ if args.duplicates:
     obj.duplicate_info()
     sys.exit(0)
 
+if args.uid:
+    obj.query_uid(args.uid[0])
+    sys.exit(0)
 obj.update_index()
