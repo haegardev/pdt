@@ -64,6 +64,7 @@ class Payloads:
             fn = self.repository + os.sep +  uid +  os.sep + "stage1.dat"
             print (sha1,fn)
 
+    #FIXME stage1.dat can be the same but stage2 different
     def duplicate_info(self):
         print ("#uid,sha1,count")
         for (uid,sha1,count) in self.cur.execute("SELECT uid,sha1,COUNT(*) \
