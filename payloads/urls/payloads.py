@@ -18,7 +18,8 @@ class Payloads:
                                      source_port INTEGER,
                                      url TEXT,
                                      sha1 TEXT,
-                                     uid TEXT);
+                                     uid TEXT,
+                                     length INTEGER);
          """
         self.cur.execute(sql)
 
