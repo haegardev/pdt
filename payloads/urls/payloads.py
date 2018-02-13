@@ -111,10 +111,8 @@ class Payloads:
             data.append((id,uid,filename))
 
         for (id,uid,filename) in data:
-            print ("filename", filename)
             cnt+=1
             if cnt == 1:
-                print ("UPDATE",id)
                 self.cur.execute("UPDATE stage2 SET isref=? WHERE id = ?;",
                                  [ "TRUE", id]);
                 self.con.commit()
