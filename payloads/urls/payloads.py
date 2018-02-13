@@ -6,10 +6,12 @@ import hashlib
 import sys
 
 class Payloads:
+
     def __init__(self, database, repository):
         self.database = database
         self.repository = repository
         self.con = sqlite3.connect(database)
+        self.con.isolation_level=None
         self.cur = self.con.cursor()
 
     def create_new_index(self):
@@ -58,6 +60,7 @@ class Payloads:
     #in metadata file
 
     def update_index(self):
+        self.con.execute('BEGIN TRANSACTION')
         for uuid in os.listdir(self.repository):
             d = self.repository + os.sep + uuid
             ts = self.get_timestamp(d)
@@ -69,7 +72,8 @@ class Payloads:
             self.cur.execute("INSERT INTO payloads (ts, url, sha1,\
                 uid, length) VALUES (?,?,?,?,?)",[ts,url,h,uuid,l])
             self.update_stage2(uuid)
-        self.con.commit()
+        #self.con.commit()
+        self.con.execute('END TRANSACTION')
 
     def fetch_url(self,uuid):
         fn = self.repository + os.sep + uuid + os.sep + "stage1.url"
