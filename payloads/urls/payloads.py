@@ -25,7 +25,8 @@ class Payloads:
         self.cur.execute(sql)
         sql = """ CREATE TABLE stage2 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                        ts DATETIME,
-                                       uuid TEXT UNIQUE,
+                                       uuid TEXT,
+                                       filename TEXT,
                                        sha1 TEXT,
                                        length INTEGER);
              """
@@ -42,7 +43,18 @@ class Payloads:
             m.update(f.read())
         return m.hexdigest()
 
-    #TODO modify download script to add source ip, timestamp, source ip
+    def update_stage2(self, uuid):
+        d = self.repository + os.sep + uuid +  os.sep  +"stage2"
+        if os.path.exists(d):
+            for i in os.listdir(d):
+                fn = d + os.sep + i
+                ts = self.get_timestamp(fn)
+                hsh = self.compute_hash(fn)
+                sz  = int(os.stat(fn).st_size)
+                self.cur.execute("INSERT INTO stage2 \
+                                  (ts, uuid, filename, sha1, length)\
+                                  VALUES (?,?,?,?,?);",[ts, uuid, i, hsh, sz])
+#TODO modify download script to add source ip, timestamp, source ip
     #in metadata file
 
     def update_index(self):
@@ -56,6 +68,7 @@ class Payloads:
             l = int(os.stat(stage1).st_size)
             self.cur.execute("INSERT INTO payloads (ts, url, sha1,\
                 uid, length) VALUES (?,?,?,?,?)",[ts,url,h,uuid,l])
+            self.update_stage2(uuid)
         self.con.commit()
 
     def fetch_url(self,uuid):
