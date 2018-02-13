@@ -109,13 +109,16 @@ class Payloads:
                                             WHERE sha1 = ? ", [sha1]):
             cnt+=1
             if cnt == 1:
-                print ("Update:", uid, id)
+                print ("UPDATE",id)
+                self.cur.execute("UPDATE stage2 SET isref=? WHERE id = ?;",
+                                 [ "TRUE", id]);
+                self.con.commit()
                 continue
-            print (uid, sha1)
+            #print (uid, sha1)
 
     def remove_duplicates_stage2(self):
         data = []
-        for (ts,sha1) in self.cur.execute("SELECT ts,sha1 FROM payloads WHERE\
+        for (ts,sha1) in self.cur.execute("SELECT ts,sha1 FROM stage2 WHERE\
                                       length > 0 GROUP BY SHA1\
                                       HAVING COUNT(*) > 1 ORDER BY ts;"):
             data.append(sha1)
