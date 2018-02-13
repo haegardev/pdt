@@ -141,6 +141,10 @@ class Payloads:
                 if nfiles == 0:
                     print ("Removing ",d)
                     os.rmdir(d)
+                    fn = self.repository + os.sep + uuid + os.sep + "stage2.urls"
+                    if os.path.exists(fn):
+                        print ("Removing ", fn)
+                        os.unlink(fn)
 
     def purge(self):
         self.remove_duplicates_stage2()
