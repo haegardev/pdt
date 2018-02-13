@@ -133,8 +133,18 @@ class Payloads:
         for  sha1 in data:
             self.remove_stage2_files(sha1)
 
+    def clean_empty_directories(self):
+        for uuid in os.listdir(self.repository):
+            d = self.repository + os.sep + uuid + os.sep + "stage2"
+            if os.path.exists(d):
+                nfiles = len(os.listdir(d))
+                if nfiles == 0:
+                    print ("Removing ",d)
+                    os.rmdir(d)
+
     def purge(self):
         self.remove_duplicates_stage2()
+        self.clean_empty_directories()
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
