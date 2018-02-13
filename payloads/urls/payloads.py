@@ -159,10 +159,18 @@ class Payloads:
                         print ("Removing ",urlf)
                         os.unlink(urlf)
 
+    def remove_empty_uids(self):
+        for uid in os.listdir(self.repository):
+            d = self.repository + os.sep + uid
+            if len(os.listdir(d)) == 0:
+                print ("Removing ", d)
+                os.rmdir(d)
+
     def purge(self):
         self.remove_duplicates_stage2()
         self.clean_empty_directories()
         self.remove_empty_stage1()
+        self.remove_empty_uids()
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
