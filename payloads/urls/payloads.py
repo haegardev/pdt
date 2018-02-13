@@ -120,6 +120,8 @@ class Payloads:
                 fn = self.repository + os.sep + uid + os.sep + "stage2" + os.sep + filename
                 if os.path.exists(fn):
                     print ("Removing:",fn)
+                    #TODO check if files were not marked to be kept by a
+                    #previous run
                     os.unlink(fn)
 
     def remove_duplicates_stage2(self):
