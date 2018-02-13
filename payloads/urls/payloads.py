@@ -102,6 +102,22 @@ class Payloads:
         for (uid,sha1) in self.cur.execute("SELECT uid,sha1 FROM payloads WHERE sha1 = ? ",[sha1]):
             print (self.repository + os.sep + uid + os.sep + "stage1.dat")
 
+    def remove_stage2_files(self,  sha1):
+        for (uid,sha1) in self.cur.execute("SELECT uuid, sha1 FROM stage2 WHERE sha1 = ? ", [sha1]):
+            print (uid, sha1)
+
+    def remove_duplicates_stage2(self):
+        data = []
+        for (ts,sha1) in self.cur.execute("SELECT ts,sha1 FROM payloads WHERE\
+                                      length > 0 GROUP BY SHA1\
+                                      HAVING COUNT(*) > 1 ORDER BY ts;"):
+            data.append(sha1)
+        for  sha1 in data:
+            self.remove_stage2_files(sha1)
+
+    def purge(self):
+        self.remove_duplicates_stage2()
+
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
 parser.add_argument("--repository", type=str, nargs=1, required=True)
@@ -109,6 +125,7 @@ parser.add_argument("--database", type=str, nargs=1, required=True)
 parser.add_argument("--hashes", action="store_true")
 parser.add_argument("--duplicates", action="store_true")
 parser.add_argument("--uid", type=str, nargs=1, required=False)
+parser.add_argument("--purge", action="store_true")
 
 args = parser.parse_args()
 
@@ -126,5 +143,9 @@ if args.duplicates:
 
 if args.uid:
     obj.query_uid(args.uid[0])
+    sys.exit(0)
+
+if args.purge:
+    obj.purge()
     sys.exit(0)
 obj.update_index()
