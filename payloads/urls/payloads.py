@@ -103,7 +103,14 @@ class Payloads:
             print (self.repository + os.sep + uid + os.sep + "stage1.dat")
 
     def remove_stage2_files(self,  sha1):
-        for (uid,sha1) in self.cur.execute("SELECT uuid, sha1 FROM stage2 WHERE sha1 = ? ", [sha1]):
+        #First one is set as reference and should not be removed
+        cnt = 0
+        for (id,uid,sha1) in self.cur.execute("SELECT id, uuid, sha1 FROM stage2 \
+                                            WHERE sha1 = ? ", [sha1]):
+            cnt+=1
+            if cnt == 1:
+                print ("Update:", uid, id)
+                continue
             print (uid, sha1)
 
     def remove_duplicates_stage2(self):
