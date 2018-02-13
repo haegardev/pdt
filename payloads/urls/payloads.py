@@ -146,9 +146,23 @@ class Payloads:
                         print ("Removing ", fn)
                         os.unlink(fn)
 
+    def remove_empty_stage1(self):
+        for uid in os.listdir(self.repository):
+            fn =  self.repository + os.sep + uid + os.sep + "stage1.dat"
+            if os.path.exists(fn):
+                sz = os.stat(fn).st_size
+                if sz == 0:
+                    print ("Removing ",fn)
+                    os.unlink(fn)
+                    urlf = self.repository + os.sep +  uid  + os.sep + "stage1.url"
+                    if os.path.exists(urlf):
+                        print ("Removing ",urlf)
+                        os.unlink(urlf)
+
     def purge(self):
         self.remove_duplicates_stage2()
         self.clean_empty_directories()
+        self.remove_empty_stage1()
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
