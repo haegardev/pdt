@@ -124,6 +124,28 @@ class Payloads:
                     #previous run
                     os.unlink(fn)
 
+    def remove_stage1_files(self,  sha1):
+        #First one is set as reference and should not be removed
+        cnt = 0
+        data= []
+        for (id,uid) in self.cur.execute("SELECT id, uid FROM payloads\
+                                            WHERE sha1 = ? ", [sha1]):
+            data.append((id,uid))
+
+        for (id,uid) in data:
+            cnt+=1
+            if cnt == 1:
+                self.cur.execute("UPDATE payloads SET isref=? WHERE id = ?;",
+                                 [ "TRUE", id]);
+                self.con.commit()
+            else:
+                fn = self.repository + os.sep + uid + os.sep + "stage1.dat"
+                if os.path.exists(fn):
+                    print ("Removing:",fn)
+                    #TODO check if files were not marked to be kept by a
+                    #previous run
+                    os.unlink(fn)
+                    #TODO unlink url file
     def remove_duplicates_stage2(self):
         data = []
         for (ts,sha1) in self.cur.execute("SELECT ts,sha1 FROM stage2 WHERE\
@@ -132,6 +154,15 @@ class Payloads:
             data.append(sha1)
         for  sha1 in data:
             self.remove_stage2_files(sha1)
+
+    def remove_duplicates_stage1(self):
+        data = []
+        for (ts,sha1) in self.cur.execute("SELECT ts,sha1 FROM payloads WHERE\
+                                      length > 0 GROUP BY SHA1\
+                                      HAVING COUNT(*) > 1 ORDER BY ts;"):
+            data.append(sha1)
+        for  sha1 in data:
+            self.remove_stage1_files(sha1)
 
     def clean_empty_directories(self):
         for uuid in os.listdir(self.repository):
@@ -168,6 +199,7 @@ class Payloads:
 
     def purge(self):
         self.remove_duplicates_stage2()
+        self.remove_duplicates_stage1()
         self.clean_empty_directories()
         self.remove_empty_stage1()
         self.remove_empty_uids()
