@@ -22,7 +22,8 @@ class Payloads:
                                      url TEXT,
                                      sha1 TEXT,
                                      uid TEXT UNIQUE,
-                                     length INTEGER);
+                                     length INTEGER,
+                                     isref BOOL DEFAULT FALSE);
          """
         self.cur.execute(sql)
         sql = """ CREATE TABLE stage2 (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +31,8 @@ class Payloads:
                                        uuid TEXT,
                                        filename TEXT,
                                        sha1 TEXT,
-                                       length INTEGER);
+                                       length INTEGER,
+                                       isref BOOL DEFAULT FALSE);
              """
         self.cur.execute(sql)
 
