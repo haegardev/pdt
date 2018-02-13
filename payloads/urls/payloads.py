@@ -105,16 +105,24 @@ class Payloads:
     def remove_stage2_files(self,  sha1):
         #First one is set as reference and should not be removed
         cnt = 0
-        for (id,uid,sha1) in self.cur.execute("SELECT id, uuid, sha1 FROM stage2 \
+        data= []
+        for (id,uid,filename) in self.cur.execute("SELECT id, uuid,filename FROM stage2 \
                                             WHERE sha1 = ? ", [sha1]):
+            data.append((id,uid,filename))
+
+        for (id,uid,filename) in data:
+            print ("filename", filename)
             cnt+=1
             if cnt == 1:
                 print ("UPDATE",id)
                 self.cur.execute("UPDATE stage2 SET isref=? WHERE id = ?;",
                                  [ "TRUE", id]);
                 self.con.commit()
-                continue
-            #print (uid, sha1)
+            else:
+                fn = self.repository + os.sep + uid + os.sep + "stage2" + os.sep + filename
+                if os.path.exists(fn):
+                    print ("Removing:",fn)
+                    os.unlink(fn)
 
     def remove_duplicates_stage2(self):
         data = []
