@@ -108,9 +108,11 @@ VALUES (?,?);",[uid,url])
         return url
 
     def print_hashes(self):
-        for (sha1,uid) in self.cur.execute("SELECT sha1,uid FROM payloads WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
+        for (ts, sha1,uid) in self.cur.execute(
+"SELECT strftime( datetime(ts,'unixepoch')) as date, sha1,uid FROM payloads \
+WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             fn = self.repository + os.sep +  uid +  os.sep + "stage1.dat"
-            print (sha1,fn)
+            print (ts, sha1,fn)
 
     #FIXME stage1.dat can be the same but stage2 different
     def duplicate_info(self):
