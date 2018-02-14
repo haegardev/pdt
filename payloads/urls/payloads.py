@@ -53,6 +53,15 @@ class Payloads:
             m.update(f.read())
         return m.hexdigest()
 
+    def update_stage2_urls(self, uid):
+        fn = self.repository + os.sep + uid + os.sep + "stage2.urls"
+        if os.path.exists(fn):
+            with open(fn, "r") as f:
+                for url in f.readlines():
+                    url = url[:-1]
+                    self.cur.execute("INSERT INTO stage2_urls (uid,url)\
+VALUES (?,?);",[uid,url])
+
     def update_stage2(self, uuid):
         d = self.repository + os.sep + uuid +  os.sep  +"stage2"
         if os.path.exists(d):
@@ -80,6 +89,7 @@ class Payloads:
                 l = int(os.stat(stage1).st_size)
                 self.cur.execute("INSERT INTO payloads (ts, url, sha1,\
                     uid, length) VALUES (?,?,?,?,?)",[ts,url,h,uuid,l])
+                self.update_stage2_urls(uuid)
                 self.update_stage2(uuid)
             except sqlite3.IntegrityError as e:
                 #Skip duplicates
