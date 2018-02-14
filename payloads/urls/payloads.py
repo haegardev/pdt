@@ -78,6 +78,8 @@ class Payloads:
             except sqlite3.IntegrityError as e:
                 #Skip duplicates
                 pass
+            except FileNotFoundError as e:
+                pass
         #self.con.commit()
         self.con.execute('END TRANSACTION')
 
