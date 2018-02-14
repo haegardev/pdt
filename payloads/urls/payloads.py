@@ -64,16 +64,20 @@ class Payloads:
     def update_index(self):
         self.con.execute('BEGIN TRANSACTION')
         for uuid in os.listdir(self.repository):
-            d = self.repository + os.sep + uuid
-            ts = self.get_timestamp(d)
-            url = self.fetch_url(uuid)
-            #TODO Record file size aswell
-            stage1 = self.repository + os.sep + uuid + os.sep + "stage1.dat"
-            h = self.compute_hash(stage1)
-            l = int(os.stat(stage1).st_size)
-            self.cur.execute("INSERT INTO payloads (ts, url, sha1,\
-                uid, length) VALUES (?,?,?,?,?)",[ts,url,h,uuid,l])
-            self.update_stage2(uuid)
+            try:
+                d = self.repository + os.sep + uuid
+                ts = self.get_timestamp(d)
+                url = self.fetch_url(uuid)
+                #TODO Record file size aswell
+                stage1 = self.repository + os.sep + uuid + os.sep + "stage1.dat"
+                h = self.compute_hash(stage1)
+                l = int(os.stat(stage1).st_size)
+                self.cur.execute("INSERT INTO payloads (ts, url, sha1,\
+                    uid, length) VALUES (?,?,?,?,?)",[ts,url,h,uuid,l])
+                self.update_stage2(uuid)
+            except sqlite3.IntegrityError as e:
+                #Skip duplicates
+                pass
         #self.con.commit()
         self.con.execute('END TRANSACTION')
 
