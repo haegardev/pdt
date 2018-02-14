@@ -145,7 +145,11 @@ class Payloads:
                     #TODO check if files were not marked to be kept by a
                     #previous run
                     os.unlink(fn)
-                    #TODO unlink url file
+                    urlf = self.repository + os.sep + uid + os.sep + "stage1.url"
+                    if os.path.exists(urlf):
+                        print ("Removing: ",urlf)
+                        os.unlink(urlf)
+
     def remove_duplicates_stage2(self):
         data = []
         for (ts,sha1) in self.cur.execute("SELECT ts,sha1 FROM stage2 WHERE\
