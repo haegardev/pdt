@@ -36,6 +36,12 @@ class Payloads:
              """
         self.cur.execute(sql)
 
+        sql = """ CREATE TABLE stage2_urls (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            url TEXT,
+                                            uid TEXT);
+             """
+        self.cur.execute(sql)
+
     def get_timestamp(self, directory):
         #FIXME Get the download timestamp from filesystem
         #get it from somewhere else as it is error prone
