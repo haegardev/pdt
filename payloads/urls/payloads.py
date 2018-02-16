@@ -4,6 +4,7 @@ import argparse
 import os
 import hashlib
 import sys
+import time
 
 class Payloads:
 
@@ -247,12 +248,10 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             print (date,cnt)
 
     def show_last_entries(self):
-        for item in self.cur.execute("SELECT MAX(STRFTIME('%Y-%m-%d %H:%m:%S', \
-                        DATETIME(ts,'unixepoch')))  AS date FROM payloads;"):
-            print ("stage1", item[0])
-        for item in self.cur.execute("SELECT MAX(STRFTIME('%Y-%m-%d %H:%m:%S', \
-                        DATETIME(ts,'unixepoch')))  AS date FROM stage2;"):
-            print ("stage2", item[0])
+        for item in self.cur.execute("SELECT MAX(ts) FROM payloads;"):
+            print ("stage1", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(item[0])))
+        for item in self.cur.execute("SELECT MAX(ts) FROM stage2;"):
+            print ("stage2", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(item[0])))
 
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
