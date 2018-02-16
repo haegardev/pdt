@@ -5,6 +5,7 @@ import os
 import hashlib
 import sys
 import time
+import syslog
 
 class Payloads:
 
@@ -144,7 +145,7 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             else:
                 fn = self.repository + os.sep + uid + os.sep + "stage2" + os.sep + filename
                 if os.path.exists(fn):
-                    print ("Removing:",fn)
+                    syslog.syslog ("Removing:" + fn)
                     #TODO check if files were not marked to be kept by a
                     #previous run
                     os.unlink(fn)
@@ -166,13 +167,13 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             else:
                 fn = self.repository + os.sep + uid + os.sep + "stage1.dat"
                 if os.path.exists(fn):
-                    print ("Removing:",fn)
+                    syslog.syslog ("Removing:" +fn)
                     #TODO check if files were not marked to be kept by a
                     #previous run
                     os.unlink(fn)
                     urlf = self.repository + os.sep + uid + os.sep + "stage1.url"
                     if os.path.exists(urlf):
-                        print ("Removing: ",urlf)
+                        syslog.syslog ("Removing: " + urlf)
                         os.unlink(urlf)
 
     def remove_duplicates_stage2(self):
@@ -199,11 +200,11 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             if os.path.exists(d):
                 nfiles = len(os.listdir(d))
                 if nfiles == 0:
-                    print ("Removing ",d)
+                    syslog.syslog ("Removing " + d)
                     os.rmdir(d)
                     fn = self.repository + os.sep + uuid + os.sep + "stage2.urls"
                     if os.path.exists(fn):
-                        print ("Removing ", fn)
+                        syslog.syslog("Removing " + fn)
                         os.unlink(fn)
 
     def remove_empty_stage1(self):
@@ -212,18 +213,18 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
             if os.path.exists(fn):
                 sz = os.stat(fn).st_size
                 if sz == 0:
-                    print ("Removing ",fn)
+                    syslog.syslog("Removing " + fn)
                     os.unlink(fn)
                     urlf = self.repository + os.sep +  uid  + os.sep + "stage1.url"
                     if os.path.exists(urlf):
-                        print ("Removing ",urlf)
+                        syslog.syslog("Removing " + urlf)
                         os.unlink(urlf)
 
     def remove_empty_uids(self):
         for uid in os.listdir(self.repository):
             d = self.repository + os.sep + uid
             if len(os.listdir(d)) == 0:
-                print ("Removing ", d)
+                syslog.syslog ("Removing "+ d)
                 os.rmdir(d)
 
     def purge(self):
