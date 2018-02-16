@@ -235,7 +235,9 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
     def downloads_per_day(self):
         print("#Stage 1 downloads")
         print("#Day frequency")
-        for date,cnt in self.cur.execute("select strftime(\"%Y-%m-%d\", datetime(ts,'unixepoch'))  as date,count(*) from payloads group by date;"):
+        for date,cnt in self.cur.execute("SELECT \
+                    STRFTIME(\"%Y-%m-%d\", DATETIME(ts,'unixepoch')) AS \
+                    date, COUNT(*) FROM payloads GROUP BY date;"):
             print (date,cnt)
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
