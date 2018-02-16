@@ -239,6 +239,13 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
                     STRFTIME(\"%Y-%m-%d\", DATETIME(ts,'unixepoch')) AS \
                     date, COUNT(*) FROM payloads GROUP BY date;"):
             print (date,cnt)
+        print ("#Stage2 downloads")
+        print("#Day frequency")
+        for date,cnt in self.cur.execute("SELECT \
+                    STRFTIME(\"%Y-%m-%d\", DATETIME(ts,'unixepoch')) AS \
+                    date, COUNT(*) FROM stage2 GROUP BY date;"):
+            print (date,cnt)
+
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
