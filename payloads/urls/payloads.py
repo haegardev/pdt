@@ -246,6 +246,14 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
                     date, COUNT(*) FROM stage2 GROUP BY date;"):
             print (date,cnt)
 
+    def show_last_entries(self):
+        for item in self.cur.execute("SELECT MAX(STRFTIME('%Y-%m-%d %H:%m:%S', \
+                        DATETIME(ts,'unixepoch')))  AS date FROM payloads;"):
+            print ("stage1", item[0])
+        for item in self.cur.execute("SELECT MAX(STRFTIME('%Y-%m-%d %H:%m:%S', \
+                        DATETIME(ts,'unixepoch')))  AS date FROM stage2;"):
+            print ("stage2", item[0])
+
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
@@ -280,7 +288,9 @@ if args.purge:
     sys.exit(0)
 
 if args.show:
-    args.show == "download"
-    obj.downloads_per_day()
+    if args.show == "download":
+        obj.downloads_per_day()
+    if args.show == "last":
+        obj.show_last_entries()
     sys.exit(0)
 obj.update_index()
