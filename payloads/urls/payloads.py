@@ -232,6 +232,12 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
         self.remove_empty_stage1()
         self.remove_empty_uids()
 
+    def downloads_per_day(self):
+        print("#Stage 1 downloads")
+        print("#Day frequency")
+        for date,cnt in self.cur.execute("select strftime(\"%Y-%m-%d\", datetime(ts,'unixepoch'))  as date,count(*) from payloads group by date;"):
+            print (date,cnt)
+
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
 parser.add_argument("--repository", type=str, nargs=1, required=True)
@@ -240,6 +246,7 @@ parser.add_argument("--hashes", action="store_true")
 parser.add_argument("--duplicates", action="store_true")
 parser.add_argument("--uid", type=str, nargs=1, required=False)
 parser.add_argument("--purge", action="store_true")
+parser.add_argument("--show", type=str)
 
 args = parser.parse_args()
 
@@ -261,5 +268,10 @@ if args.uid:
 
 if args.purge:
     obj.purge()
+    sys.exit(0)
+
+if args.show:
+    args.show == "download"
+    obj.downloads_per_day()
     sys.exit(0)
 obj.update_index()
