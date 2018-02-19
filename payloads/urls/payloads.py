@@ -296,7 +296,7 @@ if args.show:
 
     if args.show == "download":
         obj.downloads_per_day()
-    if args.show == "last":
+    if args.show == "last download":
         obj.show_last_entries()
     sys.exit(0)
 obj.update_index()
