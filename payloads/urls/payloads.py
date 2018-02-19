@@ -288,6 +288,12 @@ if args.purge:
     sys.exit(0)
 
 if args.show:
+    if args.show == "help":
+        print ("show download\t\tShow downlad histogram data extracted from the\
+ database")
+        print ("show last download\tShow the last download")
+        sys.exit(1)
+
     if args.show == "download":
         obj.downloads_per_day()
     if args.show == "last":
