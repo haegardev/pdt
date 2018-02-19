@@ -254,6 +254,11 @@ WHERE  length > 0 GROUP BY SHA1 ORDER BY uid"):
         for item in self.cur.execute("SELECT MAX(ts) FROM stage2;"):
             print ("stage2", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(item[0])))
 
+    def show_last_sample(self):
+        for uid,ts in self.cur.execute("SELECT uid,DATETIME(ts, 'unixepoch')\
+            AS DATE FROM payloads WHERE isref=\"TRUE\" ORDER BY DATE\
+            DESC LIMIT 1"):
+            print (ts, self.repository + os.sep + uid)
 
 parser = argparse.ArgumentParser(description="Sighting tests for files")
 parser.add_argument("--create", action="store_true")
@@ -292,11 +297,14 @@ if args.show:
         print ("show download\t\tShow downlad histogram data extracted from the\
  database")
         print ("show last download\tShow the last download")
+        print ("show last sample\tShow the last sample")
         sys.exit(1)
 
     if args.show == "download":
         obj.downloads_per_day()
     if args.show == "last download":
         obj.show_last_entries()
+    if args.show == "last sample":
+        obj.show_last_sample()
     sys.exit(0)
 obj.update_index()
