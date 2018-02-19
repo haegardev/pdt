@@ -296,8 +296,8 @@ if args.show:
     if args.show == "help":
         print ("show download\t\tShow downlad histogram data extracted from the\
  database")
-        print ("show last download\tShow the last download")
-        print ("show last sample\tShow the last sample")
+        print ("show \"last download\"\tShow the last download")
+        print ("show \"last sample\"\tShow the last sample")
         sys.exit(1)
 
     if args.show == "download":
