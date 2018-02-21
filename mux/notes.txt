@@ -1,0 +1,32 @@
+Tests about multiplexing
+
+References:
+- https://stackoverflow.com/questions/6786284/gcc-atomic-built-in-functions
+- https://gcc.gnu.org/onlinedocs/gcc-4.1.0/gcc/Atomic-Builtins.html
+
+TODO investigate lock-free queues lock-free such as
+https://github.com/mitghi/lfqueue
+
+Context 1 producer 1 consumer BUFFER
+
+Scenarios:
+
+1. Producer -  gets index adds element in buf[0]
+2. Producer -  uses __sync_fetch_and_add to get next index
+3. Consumer -  uses __sync_fetch_and_add to *set* next index to 1
+4. Consumer -  copies memory of index - 1 buf[0], buf[0] cannot be ready
+5. Consumer -  bzeros memory
+6. Producer -  uses __sync_fetch_and_add set next index to 2
+7. Producer -  fills buf[2]
+8. Consumer -  uses  __sync_fetch_and_add and set index to 3
+9. Consumer -  reads  buf[2] -> buf can be not ready
+
+
+Problem 1: Consumer increase index to avoid  that the producer overwrites data
+that is currently be read
+
+Problem 2: Consumer can consume data that is not ready
+
+Problem 3: Dead consumer
+
+Problem 4: Consumer dies during processing
