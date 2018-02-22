@@ -1,3 +1,4 @@
 select datetime(ts,'unixepoch') as date from flows;
 select datetime(ts,'unixepoch') as date from flows where date > DateTime("2018-01-01 05:28:00");
 select strftime("%d", datetime(ts,'unixepoch')) as date from flows;
+select strftime("%Y-%m-%d", datetime(ts,'unixepoch')) as date from payloads;
