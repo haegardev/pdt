@@ -84,3 +84,7 @@ Producer produces first element
 
 Consumer must know if no data was produced
 
+-------------------------------------------------------------------------------
+//Alternative to memcpy  adjust pointer to the next read call such that
+// the data goes directly in the shared memory segment
+-------------------------------------------------------------------------------
