@@ -112,3 +112,12 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0360e/DDI0360E_arm11_mpcore_
 accessible via gcc in user space?
 https://community.arm.com/tools/f/discussions/535/atomic-operations
 ------------------------------------------------------------------------------
+
+https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/_005f_005fatomic-Builtins.html#g_t_005f_005fatomic-Builtins
+
+"""
+These functions are intended to replace the legacy ‘__sync’ builtins. The
+main difference is that the memory order that is requested is a parameter to
+the functions. New code should always use the ‘__atomic’ builtins rather
+than the ‘__sync’ builtins.
+"""
