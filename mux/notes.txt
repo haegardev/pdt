@@ -88,3 +88,16 @@ Consumer must know if no data was produced
 //Alternative to memcpy  adjust pointer to the next read call such that
 // the data goes directly in the shared memory segment
 -------------------------------------------------------------------------------
+
+Multiple consumers:
+
+producer adds a counter to the consumed element, the last consumer frees up
+the buffer
+-------------------------------------------------------------------------------
+
+Producers and consumers have to hanlde timeout information
+-------------------------------------------------------------------------------
+other examples:
+https://codereview.stackexchange.com/questions/22915/lock-free-mpmc-ring-buffer-implementation-in-c
+
+------------------------------------------------------------------------------
