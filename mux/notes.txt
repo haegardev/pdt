@@ -101,3 +101,13 @@ other examples:
 https://codereview.stackexchange.com/questions/22915/lock-free-mpmc-ring-buffer-implementation-in-c
 
 ------------------------------------------------------------------------------
+
+Atomic operations on  ARM1176JZF-S processor or ARMv6?
+
+ARMv11: SWP, SWPB
+ARMv6: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0419c/index.html
+
+http://infocenter.arm.com/help/topic/com.arm.doc.ddi0360e/DDI0360E_arm11_mpcore_r1p0_trm.pdf
+
+accessible via gcc in user space?
+------------------------------------------------------------------------------
