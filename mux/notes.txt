@@ -121,3 +121,11 @@ main difference is that the memory order that is requested is a parameter to
 the functions. New code should always use the ‘__atomic’ builtins rather
 than the ‘__sync’ builtins.
 """
+
+Other stuff:
+- https://lmax-exchange.github.io/disruptor/
+- http://man7.org/linux/man-pages/man2/eventfd.2.html
+- http://man7.org/linux/man-pages/man3/mq_notify.3.html
+- https://users.pja.edu.pl/~jms/qnx/help/watcom/clibref/mq_overview.html
+- https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html
+- http://liburcu.org/
