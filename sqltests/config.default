@@ -1,3 +1,4 @@
+PDT="/usr/local/bin"
 NSHARDS="6"
 YEAR="2018"
 MAXFILES="288"
