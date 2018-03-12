@@ -2,7 +2,7 @@
 #Create file lists of pcaps that should be indexed in a single index file
 #These files can be procesed with the following command
 #
-# find toindex/ -type f | sort | parallel -j 7 ./index_chunk.sh {}
+# find toindex/ -type f | sort | parallel -j 7 ./index_chunk.sh config {}
 #
 
 CONFIG="$1"
