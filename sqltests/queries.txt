@@ -2,3 +2,5 @@ select datetime(ts,'unixepoch') as date from flows;
 select datetime(ts,'unixepoch') as date from flows where date > DateTime("2018-01-01 05:28:00");
 select strftime("%d", datetime(ts,'unixepoch')) as date from flows;
 select strftime("%Y-%m-%d", datetime(ts,'unixepoch')) as date from payloads;
+select destination_port,count(*),ttl from flows where destination_ip==tcpseq group by destination_port;
+select count(*) from (select distinct source_ip from flows);
