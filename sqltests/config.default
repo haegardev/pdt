@@ -1,0 +1,8 @@
+PDT="/usr/local/bin"
+NSHARDS="6"
+YEAR="2018"
+MAXFILES="288"
+SENSOR="test"
+DATA="/data"
+RESDIR="/index"
+
