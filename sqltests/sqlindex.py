@@ -130,8 +130,13 @@ class SQLIndex:
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=True)
-parser.add_argument("--query", type=str, nargs=1, required=False)
-parser.add_argument("--filename",type=str,nargs=1,required=False)
+parser.add_argument("--query", type=str, nargs=1, required=False,
+                    help="Execute an SQL query on the database. IP addresses\
+ in the query string are translated from dotted decimal into binary values.")
+parser.add_argument("--filename",type=str,nargs=1,required=False,
+                    help="Read input from stdin and insert it into flows table. \
+The filename parameter helps to propagte the filename into the sources table. \
+The indexing is started when this parameter is set.")
 args = parser.parse_args()
 
 sqi = SQLIndex(args.database[0])
