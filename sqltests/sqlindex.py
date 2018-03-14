@@ -135,6 +135,7 @@ class SQLIndex:
         for i in self.cur.execute(q):
             print (i)
 
+    #TODO check filemagic of databases that are added
     def sync_database_files(self, directory):
         red = redis.Redis(host=self.redis_server,port=self.redis_port)
         key = self.instance + "_" + "DATABASES"
