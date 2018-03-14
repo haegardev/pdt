@@ -165,7 +165,6 @@ class SQLIndex:
         min_id = sys.maxsize
         for i in red.smembers(self.instance + "_JOBS"):
             i = int(i)
-            print ("test",i)
             if i<min_id:
                 min_id = i
         if min_id == sys.maxsize:
