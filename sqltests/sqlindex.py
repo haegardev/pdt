@@ -192,7 +192,7 @@ class SQLIndex:
         self.con = sqlite3.connect(f)
         self.cur = self.con.cursor()
         buf = self.instance + "_RESULTS_" + str(job_id)
-        self.query(query, job_id)
+        self.query(query, buf)
         #TODO add exception handling here
 
     def worker(self):
