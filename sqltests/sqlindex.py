@@ -118,7 +118,6 @@ class SQLIndex:
     #TODO Document query language
     #Buf can be a redis key where the data is submitted by a worker
     def query(self,sqlstring,buf=None):
-        print ("test:",sqlstring)
         red =  None
         if buf is not None:
             red = redis.Redis(host=self.redis_server,port=self.redis_port)
@@ -147,7 +146,6 @@ class SQLIndex:
                 #Execution order of the workers is not known and are in parallel
                 #If the job_id is anymore in JOB set the query is done
                 #TODO Link the query with the results
-                print ("update buffer with ",i)
                 red.sadd(buf,i)
 
     #TODO check filemagic of databases that are added
@@ -206,7 +204,6 @@ class SQLIndex:
             if dbfile:
                 query = red.get("QUERY_JOB_"+str(job_id))
                 if query:
-                    print ("Doing query on dbfile", query, dbfile)
                     self.execute_query(job_id, dbfile, query)
             else:
                 #Queue is empty. Remove it from the jobs set
