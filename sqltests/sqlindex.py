@@ -213,6 +213,7 @@ class SQLIndex:
                 red.srem(self.instance + "_JOBS", job_id)
                 #TODO remove query when the data is consumed
 
+    #FIXME Busy waiting. However, redis pub sub does not seem to buffer
     def worker_loop(self):
         while True:
             self.worker()
