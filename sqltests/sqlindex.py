@@ -159,7 +159,8 @@ class SQLIndex:
 
     def submit_query(self,query):
         red = redis.Redis(host=self.redis_server, port=self.redis_port)
-        #FIXME Not executed atomicly
+        #FIXME Not executed atomicly. The copying process of the databases
+        #can be interfered with a worker removing the job id
         #Keep order of jobs. Get new JOB_ID
         job_id = red.incr(self.instance+"_JOB_ID")
         red.set("QUERY_JOB_"+str(job_id), query)
