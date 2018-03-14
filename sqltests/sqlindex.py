@@ -4,14 +4,22 @@ import sqlite3
 import argparse
 import sys
 import pprint
-
+import os
+import redis
 
 class SQLIndex:
 
     def __init__(self, database):
-        self.con = sqlite3.connect(database)
-        self.con.isolation_level=None
-        self.cur = self.con.cursor()
+        if database is not None:
+            self.con = sqlite3.connect(database)
+            self.con.isolation_level=None
+            self.cur = self.con.cursor()
+        else:
+            self.con = None
+        #FIXME Set parameter if multiple servers are used for serving indices
+        self.instance="127.0.0.1"
+        self.redis_server="127.0.0.1"
+        self.redis_port=6379
 
     def __del__(self):
         if self.con is not None:
@@ -127,9 +135,17 @@ class SQLIndex:
         for i in self.cur.execute(q):
             print (i)
 
+    def sync_database_files(self, directory):
+        red = redis.Redis(host=self.redis_server,port=self.redis_port)
+        key = self.instance + "_" + "DATABASES"
+        for root, subdirs, files in os.walk(directory):
+            for f in files:
+                fn = root + os.sep + f
+                red.sadd(key, fn)
+
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
-parser.add_argument("--database", type=str, nargs=1, required=True)
+parser.add_argument("--database", type=str, nargs=1, required=False)
 parser.add_argument("--query", type=str, nargs=1, required=False,
                     help="Execute an SQL query on the database. IP addresses\
  in the query string are translated from dotted decimal into binary values.")
@@ -137,9 +153,19 @@ parser.add_argument("--filename",type=str,nargs=1,required=False,
                     help="Read input from stdin and insert it into flows table. \
 The filename parameter helps to propagte the filename into the sources table. \
 The indexing is started when this parameter is set.")
-args = parser.parse_args()
+parser.add_argument("--sync",type=str,nargs=1, help="Update redis key\
+ <HOST>_DATABASES with database files in the specified directory")
 
-sqi = SQLIndex(args.database[0])
+parser.add_argument("--submit", type=str, nargs=1, help="Submit an sql query\
+to the indices")
+
+args = parser.parse_args()
+database=args.database
+if database is not None:
+    database = args.database[0]
+
+sqi = SQLIndex(database)
+
 if args.create:
     sqi.create_schema()
 
@@ -148,3 +174,8 @@ if args.filename:
 
 if args.query:
     sqi.query(args.query[0])
+    sys.exit(0)
+
+if args.sync:
+    sqi.sync_database_files(args.sync[0])
+    sys.exit(0)
