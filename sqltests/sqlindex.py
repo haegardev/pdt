@@ -6,6 +6,7 @@ import sys
 import pprint
 import os
 import redis
+import time
 
 class SQLIndex:
 
@@ -212,6 +213,11 @@ class SQLIndex:
                 red.srem(self.instance + "_JOBS", job_id)
                 #TODO remove query when the data is consumed
 
+    def worker_loop(self):
+        while True:
+            self.worker()
+            time.sleep(0.5)
+
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
@@ -257,4 +263,4 @@ if args.submit:
     sys.exit(0)
 
 if args.worker:
-    sqi.worker()
+    sqi.worker_loop()
