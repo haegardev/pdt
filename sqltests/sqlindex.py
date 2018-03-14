@@ -162,6 +162,7 @@ class SQLIndex:
         #FIXME Not executed atomicly
         #Keep order of jobs. Get new JOB_ID
         job_id = red.incr(self.instance+"_JOB_ID")
+        red.set("QUERY_JOB_"+str(job_id), query)
         red.sadd(self.instance + "_JOBS", job_id)
         #TODO create rules for restricting databases where to look at
         databases = []
