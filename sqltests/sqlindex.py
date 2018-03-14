@@ -118,6 +118,7 @@ class SQLIndex:
     #TODO Document query language
     #Buf can be a redis key where the data is submitted by a worker
     def query(self,sqlstring,buf=None):
+        print ("test:",sqlstring)
         red =  None
         if buf is not None:
             red = redis.Redis(host=self.redis_server,port=self.redis_port)
@@ -146,6 +147,7 @@ class SQLIndex:
                 #Execution order of the workers is not known and are in parallel
                 #If the job_id is anymore in JOB set the query is done
                 #TODO Link the query with the results
+                print ("update buffer with ",i)
                 red.sadd(buf,i)
 
     #TODO check filemagic of databases that are added
@@ -186,6 +188,15 @@ class SQLIndex:
             min_id = 0
         return min_id
 
+    def execute_query(self, job_id, dbfile,query):
+        f = dbfile.decode("ASCII")
+        query = query.decode("ASCII")
+        self.con = sqlite3.connect(f)
+        self.cur = self.con.cursor()
+        buf = self.instance + "_RESULTS_" + str(job_id)
+        self.query(query, job_id)
+        #TODO add exception handling here
+
     def worker(self):
         red = redis.Redis(host=self.redis_server, port=self.redis_port)
         job_id = self.get_oldest_job_id()
@@ -193,7 +204,10 @@ class SQLIndex:
             key = self.instance + "_JOB_" + str(job_id)
             dbfile = red.lpop(key)
             if dbfile:
-                print ("Doing query on dbfile", dbfile)
+                query = red.get("QUERY_JOB_"+str(job_id))
+                if query:
+                    print ("Doing query on dbfile", query, dbfile)
+                    self.execute_query(job_id, dbfile, query)
             else:
                 #Queue is empty. Remove it from the jobs set
                 red.srem(self.instance + "_JOBS", job_id)
