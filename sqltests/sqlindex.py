@@ -116,7 +116,11 @@ class SQLIndex:
     #Modify dotted decimal IP addresses
     #TODO Translate subnet queries into logical and arithmetic operations
     #TODO Document query language
-    def query(self,sqlstring):
+    #Buf can be a redis key where the data is submitted by a worker
+    def query(self,sqlstring,buf=None):
+        red =  None
+        if buf is not None:
+            red = redis.Redis(host=self.redis_server,port=self.redis_port)
         q = sqlstring
         ips = []
         words = sqlstring.split(" ")
@@ -132,8 +136,17 @@ class SQLIndex:
             q = q.replace("\""+ip+"\"",str(iiip))
         print ("Modified query " + q)
         #FIXME output is not clean
-        for i in self.cur.execute(q):
-            print (i)
+        #TODO Check output length to avoid to write several GB of data in the
+        #output queue
+        if red is None:
+            for i in self.cur.execute(q):
+                print (i)
+        else:
+            for i in self.cur.execute(q):
+                #Execution order of the workers is not known and are in parallel
+                #If the job_id is anymore in JOB set the query is done
+                #TODO Link the query with the results
+                red.sadd(buf,i)
 
     #TODO check filemagic of databases that are added
     def sync_database_files(self, directory):
