@@ -143,6 +143,22 @@ class SQLIndex:
                 fn = root + os.sep + f
                 red.sadd(key, fn)
 
+    def submit_query(self,query):
+        red = redis.Redis(host=self.redis_server, port=self.redis_port)
+        #FIXME Not executed atomicly
+        #Keep order of jobs. Get new JOB_ID
+        job_id = red.incr(self.instance+"_JOB_ID")
+        red.sadd(self.instance + "_JOBS", job_id)
+        #TODO create rules for restricting databases where to look at
+        databases = []
+        for db in red.smembers(self.instance + "_DATABASES"):
+            databases.append(db)
+        databases.sort()
+        for db in databases:
+            key = self.instance + "_JOB_" + str(job_id)
+            red.rpush(key,db)
+        return job_id
+
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
@@ -178,4 +194,8 @@ if args.query:
 
 if args.sync:
     sqi.sync_database_files(args.sync[0])
+    sys.exit(0)
+
+if args.submit:
+    print(sqi.submit_query(args.submit[0]))
     sys.exit(0)
