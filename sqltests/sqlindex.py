@@ -197,6 +197,7 @@ class SQLIndex:
             else:
                 #Queue is empty. Remove it from the jobs set
                 red.srem(self.instance + "_JOBS", job_id)
+                #TODO remove query when the data is consumed
 
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
