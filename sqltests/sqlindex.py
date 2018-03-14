@@ -194,6 +194,7 @@ class SQLIndex:
         self.cur = self.con.cursor()
         buf = self.instance + "_RESULTS_" + str(job_id)
         self.query(query, buf)
+        self.con.close()
         #TODO add exception handling here
 
     def worker(self):
