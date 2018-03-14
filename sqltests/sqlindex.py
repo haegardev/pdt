@@ -159,6 +159,19 @@ class SQLIndex:
             red.rpush(key,db)
         return job_id
 
+    #returns the oldest job_id. If no job is there it returns 0
+    def get_oldest_job_id(self):
+        red = redis.Redis(host=self.redis_server, port=self.redis_port)
+        min_id = sys.maxsize
+        for i in red.smembers(self.instance + "_JOBS"):
+            i = int(i)
+            print ("test",i)
+            if i<min_id:
+                min_id = i
+        if min_id == sys.maxsize:
+            min_id = 0
+        return min_id
+
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
