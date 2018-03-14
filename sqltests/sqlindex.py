@@ -172,6 +172,18 @@ class SQLIndex:
             min_id = 0
         return min_id
 
+    def worker(self):
+        red = redis.Redis(host=self.redis_server, port=self.redis_port)
+        job_id = self.get_oldest_job_id()
+        if job_id > 0:
+            key = self.instance + "_JOB_" + str(job_id)
+            dbfile = red.lpop(key)
+            if dbfile:
+                print ("Doing query on dbfile", dbfile)
+            else:
+                #Queue is empty. Remove it from the jobs set
+                red.srem(self.instance + "_JOBS", job_id)
+
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
@@ -187,6 +199,9 @@ parser.add_argument("--sync",type=str,nargs=1, help="Update redis key\
 
 parser.add_argument("--submit", type=str, nargs=1, help="Submit an sql query\
 to the indices")
+
+parser.add_argument("--worker", action='store_true', help="Start worker who are\
+waiting for queries of the indexes. Choose the oldest job by default.")
 
 args = parser.parse_args()
 database=args.database
@@ -212,3 +227,6 @@ if args.sync:
 if args.submit:
     print(sqi.submit_query(args.submit[0]))
     sys.exit(0)
+
+if args.worker:
+    sqi.worker()
