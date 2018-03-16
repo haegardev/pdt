@@ -165,7 +165,6 @@ class SQLIndex:
         #Keep order of jobs. Get new JOB_ID
         job_id = red.incr(self.instance+"_JOB_ID")
         red.set("QUERY_JOB_"+str(job_id), query)
-        red.sadd(self.instance + "_JOBS", job_id)
         #TODO create rules for restricting databases where to look at
         databases = []
         for db in red.smembers(self.instance + "_DATABASES"):
@@ -174,6 +173,7 @@ class SQLIndex:
         for db in databases:
             key = self.instance + "_JOB_" + str(job_id)
             red.rpush(key,db)
+        red.sadd(self.instance + "_JOBS", job_id)
         return job_id
 
     #returns the oldest job_id. If no job is there it returns 0
