@@ -150,6 +150,28 @@ class SQLIndex:
                 #TODO Link the query with the results
                 red.sadd(buf,i)
 
+    #Returns True if the job was completed
+    #Returns False if the job is not completed
+    def consume_buffer(self, job_id, blocking=True):
+        red = redis.Redis(host=self.redis_server,port=self.redis_port)
+        key = self.instance + "_RESULTS_" + job_id
+        while True:
+            for chunk in red.smembers(key):
+                print (chunk)
+                red.delete(key,chunk)
+            key = self.instance +"_JOBS"
+            if red.sismember(key, job_id):
+                print ("The job is not done yet")
+                if blocking:
+                    print ("Wait a bit")
+                    time.sleep(0.5)
+                else:
+                    return False
+            else:
+                print ("Job is done, exit")
+                return True
+        return True
+
     #TODO check filemagic of databases that are added
     def sync_database_files(self, directory):
         red = redis.Redis(host=self.redis_server,port=self.redis_port)
@@ -239,6 +261,9 @@ to the indices")
 parser.add_argument("--worker", action='store_true', help="Start worker who are\
 waiting for queries of the indexes. Choose the oldest job by default.")
 
+parser.add_argument("--consume", type=str, nargs=1, required=False,
+                    help="Print the data produced on stdout")
+
 args = parser.parse_args()
 database=args.database
 if database is not None:
@@ -266,3 +291,8 @@ if args.submit:
 
 if args.worker:
     sqi.worker_loop()
+
+if args.consume:
+    #FIXME ignore return code
+    sqi.consume_buffer(args.consume[0])
+    sys.exit(0)
