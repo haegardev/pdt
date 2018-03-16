@@ -7,7 +7,8 @@ import pprint
 import os
 import redis
 import time
-
+#TODO add debug messages including PIDs.
+#FIXME Jobs are removed although they are not fully consumed?
 class SQLIndex:
 
     def __init__(self, database):
