@@ -196,6 +196,7 @@ class SQLIndex:
             for f in files:
                 fn = root + os.sep + f
                 red.sadd(key, fn)
+                self.log("Insert  " + fn + "into the local DATABASES set")
 
     def submit_query(self,query):
         red = redis.Redis(host=self.redis_server, port=self.redis_port)
