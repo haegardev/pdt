@@ -170,20 +170,21 @@ class SQLIndex:
     def consume_buffer(self, job_id, blocking=True):
         red = redis.Redis(host=self.redis_server,port=self.redis_port)
         key = self.instance + "_RESULTS_" + job_id
+        self.log("Request for consuming buffer "+ key)
         while True:
             for chunk in red.smembers(key):
                 print (chunk)
                 red.delete(key,chunk)
             key = self.instance +"_JOBS"
             if red.sismember(key, job_id):
-                print ("The job is not done yet")
+                self.log("The job is not done yet")
                 if blocking:
-                    print ("Wait a bit")
+                    self.log("Wait a bit")
                     time.sleep(0.5)
                 else:
                     return False
             else:
-                print ("Job is done, exit")
+                self.log ("Job is done, exit")
                 return True
         return True
 
