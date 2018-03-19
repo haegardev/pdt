@@ -70,6 +70,7 @@ class SQLIndex:
         source_id = self.cur.fetchone()[0]
         values = []
         self.con.execute('BEGIN TRANSACTION')
+        cnt=0
         for line in sys.stdin.readlines():
             line = line[:-1]
             (frameno,ts, proto, source_ip,udp_source_port, tcp_source_port, destination_ip,
@@ -122,7 +123,8 @@ class SQLIndex:
                 tcpflags,tcpack) \
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                 [source_id,frameno, ts,sip,source_port, dip, destination_port,int(proto), int(ttl), iseq, tcpflags,iack ])
-
+            cnt+=1
+        self.log("Inserted "+ str(cnt) + " packets into "+self.database)
         self.con.execute('END TRANSACTION')
 
     #Modify dotted decimal IP addresses
