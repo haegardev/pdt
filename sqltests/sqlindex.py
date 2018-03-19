@@ -262,9 +262,13 @@ class SQLIndex:
 
     #FIXME Busy waiting. However, redis pub sub does not seem to buffer
     def worker_loop(self):
+        #TODO Workers should write their PID in a PIDFile or redis
+        #TODO Handle signals TERM, USR1, USR2
+        #TODO Loop to create N workers
         self.log("Worker started")
         while True:
             self.worker()
+            #TODO check in redis what to do next?
             time.sleep(0.5)
 
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
