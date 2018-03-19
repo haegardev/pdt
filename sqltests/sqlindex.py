@@ -250,14 +250,18 @@ class SQLIndex:
             if dbfile:
                 query = red.get("QUERY_JOB_"+str(job_id))
                 if query:
+                    self.log("[worker "+ str(job_id) +"] Executing query "+ \
+                              str(query) +" on "+ str(dbfile))
                     self.execute_query(job_id, dbfile, query)
             else:
-                #Queue is empty. Remove it from the jobs set
                 red.srem(self.instance + "_JOBS", job_id)
+                self.log("Queue is empty. Remove "+ str(job_id) +\
+                           " from the jobs set")
                 #TODO remove query when the data is consumed
 
     #FIXME Busy waiting. However, redis pub sub does not seem to buffer
     def worker_loop(self):
+        self.log("Worker started")
         while True:
             self.worker()
             time.sleep(0.5)
