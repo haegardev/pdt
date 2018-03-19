@@ -149,7 +149,6 @@ class SQLIndex:
             iip = socket.inet_aton(ip)
             iiip = struct.unpack("!L", iip)[0]
             q = q.replace("\""+ip+"\"",str(iiip))
-        print ("Modified query " + q)
         #FIXME output is not clean
         #TODO Check output length to avoid to write several GB of data in the
         #output queue
