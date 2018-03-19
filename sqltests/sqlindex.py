@@ -203,8 +203,11 @@ class SQLIndex:
         #can be interfered with a worker removing the job id
         #Keep order of jobs. Get new JOB_ID
         job_id = red.incr(self.instance+"_JOB_ID")
-        red.set("QUERY_JOB_"+str(job_id), query)
+        k = "QUERY_JOB_" + str(job_id)
+        red.set(k, query)
+        self.log("Set "+ k + "to "+ query)
         #TODO create rules for restricting databases where to look at
+        self.log("Start to fill the database queues")
         databases = []
         for db in red.smembers(self.instance + "_DATABASES"):
             databases.append(db)
@@ -212,6 +215,7 @@ class SQLIndex:
         for db in databases:
             key = self.instance + "_JOB_" + str(job_id)
             red.rpush(key,db)
+        self.log("Published job " + str(job_id) +" for being processed")
         red.sadd(self.instance + "_JOBS", job_id)
         return job_id
 
