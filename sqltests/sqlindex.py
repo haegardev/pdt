@@ -14,12 +14,12 @@ import syslog
 class SQLIndex:
 
     def __init__(self, database, dbg=True):
+        self.database = database
+        self.dbg = dbg
         if database is not None:
             self.con = sqlite3.connect(database)
             self.con.isolation_level=None
             self.cur = self.con.cursor()
-            self.database = database
-            self.dbg = dbg
         else:
             self.con = None
         #FIXME Set parameter if multiple servers are used for serving indices
@@ -162,7 +162,10 @@ class SQLIndex:
                 #If the job_id is anymore in JOB set the query is done
                 #TODO Link the query with the results
                 red.sadd(buf,i)
-
+        buffname="stdout"
+        if buf is not None:
+            buffname = buf
+        self.log("Modified query " + q + " delivery results to "+buffname)
     #Returns True if the job was completed
     #Returns False if the job is not completed
     def consume_buffer(self, job_id, blocking=True):
