@@ -7,25 +7,34 @@ import pprint
 import os
 import redis
 import time
+import syslog
+
 #TODO add debug messages including PIDs.
 #FIXME Jobs are removed although they are not fully consumed?
 class SQLIndex:
 
-    def __init__(self, database):
+    def __init__(self, database, dbg=True):
         if database is not None:
             self.con = sqlite3.connect(database)
             self.con.isolation_level=None
             self.cur = self.con.cursor()
+            self.database = database
+            self.dbg = dbg
         else:
             self.con = None
         #FIXME Set parameter if multiple servers are used for serving indices
         self.instance="127.0.0.1"
         self.redis_server="127.0.0.1"
         self.redis_port=6379
+        if self.dbg == True:
+            syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_USER)
 
     def __del__(self):
         if self.con is not None:
             self.con.close()
+
+    def log(self, msg):
+        syslog.syslog(msg)
 
     def create_schema(self):
         sql = """CREATE TABLE flows (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,6 +56,7 @@ class SQLIndex:
                                    name TEXT);
           """
         self.cur.execute(sql)
+        self.log("Create database scheme in " + self.database)
     #Read from data from stdin and put them in the database
 
     def update_index(self, filename):
