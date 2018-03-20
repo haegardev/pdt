@@ -271,6 +271,24 @@ class SQLIndex:
             #TODO check in redis what to do next?
             time.sleep(0.5)
 
+    #FIXME this function should return a value instead of prining such
+    #that it can be used in API
+    def progress(self, job_id):
+        red = redis.Redis(host=self.redis_server, port=self.redis_port)
+        ndatabases = red.scard(self.instance + "_" + "DATABASES")
+        key = self.instance + "_JOB_" + str(job_id)
+        i = red.llen(key)
+        ext = False
+        while i >  0:
+            i = red.llen(key)
+            x = ndatabases - i
+            sys.stdout.write("Remaining databases to be processed  for job "+str(job_id) + \
+                             ": " + str(x) + "/" + str(ndatabases)+ \
+                             "                     \r")
+            time.sleep(0.5)
+            ext = True
+        if ext:
+            sys.stdout.write("                                                    \r\n")
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
@@ -292,6 +310,8 @@ waiting for queries of the indexes. Choose the oldest job by default.")
 
 parser.add_argument("--consume", type=str, nargs=1, required=False,
                     help="Print the data produced on stdout")
+parser.add_argument("--progress",type=str, nargs=1, required=False,
+                    help="Show the progress of a given job given by a job_id")
 
 args = parser.parse_args()
 database=args.database
@@ -324,4 +344,8 @@ if args.worker:
 if args.consume:
     #FIXME ignore return code
     sqi.consume_buffer(args.consume[0])
+    sys.exit(0)
+
+if args.progress:
+    sqi.progress(args.progress[0])
     sys.exit(0)
