@@ -243,6 +243,7 @@ class SQLIndex:
         #TODO add exception handling here
 
     def worker(self):
+        #TODO Catch exceptions on sql errors
         red = redis.Redis(host=self.redis_server, port=self.redis_port)
         job_id = self.get_oldest_job_id()
         if job_id > 0:
@@ -273,6 +274,7 @@ class SQLIndex:
 
     #FIXME this function should return a value instead of prining such
     #that it can be used in API
+    #TODO Record timestamp when the jon was started
     def progress(self, job_id):
         red = redis.Redis(host=self.redis_server, port=self.redis_port)
         ndatabases = red.scard(self.instance + "_" + "DATABASES")
