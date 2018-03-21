@@ -8,12 +8,13 @@ import os
 import redis
 import time
 import syslog
+import configparser
 
 #TODO add debug messages including PIDs.
 #FIXME Jobs are removed although they are not fully consumed?
 class SQLIndex:
 
-    def __init__(self, database, dbg=True):
+    def __init__(self, database, configfile, dbg=True):
         self.database = database
         self.dbg = dbg
         if database is not None:
@@ -24,10 +25,10 @@ class SQLIndex:
             self.con = None
         #FIXME Set parameter if multiple servers are used for serving indices
         self.instance="127.0.0.1"
-        self.redis_server="127.0.0.1"
-        self.redis_port=6379
         if self.dbg == True:
             syslog.openlog(logoption=syslog.LOG_PID, facility=syslog.LOG_USER)
+
+        self.load_config(configfile)
 
     def __del__(self):
         if self.con is not None:
@@ -35,6 +36,12 @@ class SQLIndex:
 
     def log(self, msg):
         syslog.syslog(msg)
+
+    def load_config(self, filename):
+        self.config = configparser.ConfigParser()
+        self.config.read_file(open(filename))
+        self.redis_server = self.config.get("redis", "server")
+        self.redis_port = self.config.get("redis", "port")
 
     def create_schema(self):
         sql = """CREATE TABLE flows (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -314,13 +321,14 @@ parser.add_argument("--consume", type=str, nargs=1, required=False,
                     help="Print the data produced on stdout")
 parser.add_argument("--progress",type=str, nargs=1, required=False,
                     help="Show the progress of a given job given by a job_id")
+parser.add_argument("--config", type=str, nargs=1, required=True)
 
 args = parser.parse_args()
 database=args.database
 if database is not None:
     database = args.database[0]
 
-sqi = SQLIndex(database)
+sqi = SQLIndex(database, args.config[0])
 
 if args.create:
     sqi.create_schema()
