@@ -139,6 +139,8 @@ class SQLIndex:
     #TODO Document query language
     #Buf can be a redis key where the data is submitted by a worker
     #TODO create ordered query. add timestamp and use a ZRANK as buffer
+    #TODO Work on output such that just IPs can be put in a set to avoid
+    #duplicates
     def query(self,sqlstring,buf=None):
         red =  None
         if buf is not None:
