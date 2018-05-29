@@ -74,6 +74,8 @@ class SQLIndex:
         self.cur.execute(sql)
         sql = "CREATE INDEX IF NOT EXISTS i_ts on flows (ts);"
         self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_source_ip on flows (source_ip);"
+        self.cur.execute(sql);
 
         self.log("Indexes created on " + self.database)
 
