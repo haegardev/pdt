@@ -18,6 +18,8 @@ class SQLIndex:
     def __init__(self, database, configfile, dbg=True):
         self.database = database
         self.dbg = dbg
+        self.set_index = False
+
         if database is not None:
             self.con = sqlite3.connect(database)
             self.con.isolation_level=None
@@ -66,6 +68,11 @@ class SQLIndex:
         self.cur.execute(sql)
         self.log("Create database scheme in " + self.database)
     #Read from data from stdin and put them in the database
+
+    def create_index(self):
+        sql = "CREATE INDEX IF NOT EXISTS i_source_port on flows (source_port);"
+        self.cur.execute(sql)
+        self.log("Index i_source_port created  in " + self.database)
 
     def update_index(self, filename):
         #TODO check if file was already indexed
@@ -307,6 +314,7 @@ class SQLIndex:
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
+parser.add_argument("--index",action='store_true',required=False)
 parser.add_argument("--query", type=str, nargs=1, required=False,
                     help="Execute an SQL query on the database. IP addresses\
  in the query string are translated from dotted decimal into binary values.")
@@ -335,6 +343,15 @@ if database is not None:
     database = args.database[0]
 
 sqi = SQLIndex(database, args.config[0])
+
+if args.index:
+    sqi.set_index = True
+    if args.create == False:
+        if args.database is None:
+            print("A database must be specified, abort")
+            sys.exit(1)
+        sqi.create_index()
+        sys.exit(0)
 
 if args.create:
     sqi.create_schema()
