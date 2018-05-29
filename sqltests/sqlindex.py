@@ -177,6 +177,7 @@ class SQLIndex:
         self.log("Modified query " + q + " delivery results to "+buffname)
     #Returns True if the job was completed
     #Returns False if the job is not completed
+    #TODO print SQL query as header of the results
     def consume_buffer(self, job_id, blocking=True):
         red = redis.Redis(host=self.redis_server,port=self.redis_port)
         key = self.instance + "_RESULTS_" + job_id
