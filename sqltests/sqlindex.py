@@ -10,6 +10,7 @@ import time
 import syslog
 import configparser
 
+#TODO  Add indexes such as create index isource_ip on flows (source_ip);
 #TODO add debug messages including PIDs.
 #FIXME Jobs are removed although they are not fully consumed?
 class SQLIndex:
