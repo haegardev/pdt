@@ -72,7 +72,11 @@ class SQLIndex:
     def create_index(self):
         sql = "CREATE INDEX IF NOT EXISTS i_source_port on flows (source_port);"
         self.cur.execute(sql)
-        self.log("Index i_source_port created  in " + self.database)
+        sql = "CREATE INDEX IF NOT EXISTS i_ts on flows (ts);"
+        self.cur.execute(sql)
+
+        self.log("Indexes created on " + self.database)
+
 
     def update_index(self, filename):
         #TODO check if file was already indexed
