@@ -185,6 +185,7 @@ class SQLIndex:
         while True:
             for chunk in red.smembers(key):
                 print (chunk)
+                #FIXME check statement below
                 red.delete(key,chunk)
             key = self.instance +"_JOBS"
             if red.sismember(key, job_id):
