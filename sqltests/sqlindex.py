@@ -303,6 +303,7 @@ class SQLIndex:
             ext = True
         if ext:
             sys.stdout.write("                                                    \r\n")
+#TODO add command line option to terminate a job
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
 parser.add_argument("--database", type=str, nargs=1, required=False)
