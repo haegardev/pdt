@@ -291,9 +291,13 @@ class SQLIndex:
             if dbfile:
                 query = red.get("QUERY_JOB_"+str(job_id))
                 if query:
+                    start_time = time.time()
                     self.log("[worker "+ str(job_id) +"] Executing query "+ \
                               str(query) +" on "+ str(dbfile))
                     self.execute_query(job_id, dbfile, query)
+                    end_time = time.time()
+                    d = end_time - start_time
+                    self.log("[worker "+ str(job_id) + "] Duration "+str(d))
             else:
                 red.srem(self.instance + "_JOBS", job_id)
                 self.log("Queue is empty. Remove "+ str(job_id) +\
