@@ -76,6 +76,20 @@ class SQLIndex:
         self.cur.execute(sql)
         sql = "CREATE INDEX IF NOT EXISTS i_source_ip on flows (source_ip);"
         self.cur.execute(sql);
+        sql = "CREATE INDEX IF NOT EXISTS i_destination_ip on flows(destination_ip);"
+        self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_destination_port on flows(destination_port);"
+        self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_protocol on flows (protocol);"
+        self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_ttl on flows(ttl);"
+        self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_tcpseq on flows(tcpseq);"
+        self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_tcpflags on flows(tcpflags);"
+        self.cur.execute(sql)
+        sql = "CREATE INDEX IF NOT EXISTS i_tcpack on flows (tcpack);"
+        self.cur.execute(sql)
 
         self.log("Indexes created on " + self.database)
 
