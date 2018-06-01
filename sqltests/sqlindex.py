@@ -323,7 +323,7 @@ class SQLIndex:
             try:
                 self.worker()
             except sqlite3.OperationalError as e:
-                syslog("Worker died." + str(e))
+                syslog.syslog("Worker died." + str(e))
 
             #TODO check in redis what to do next?
             time.sleep(0.5)
