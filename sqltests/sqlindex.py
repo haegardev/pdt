@@ -208,6 +208,11 @@ class SQLIndex:
     def consume_buffer(self, job_id, blocking=True):
         red = redis.Redis(host=self.redis_server,port=self.redis_port)
         key = self.instance + "_RESULTS_" + job_id
+        qkey = "QUERY_JOB_" + str(job_id)
+        query = red.get(qkey)
+        if query:
+            print ("#" + query.decode('utf-8'))
+
         self.log("Request for consuming buffer "+ key)
         while True:
             for chunk in red.smembers(key):
