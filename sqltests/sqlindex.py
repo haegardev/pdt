@@ -215,7 +215,11 @@ class SQLIndex:
         self.log("Request for consuming buffer "+ key)
         while True:
             for chunk in red.smembers(key):
-                print (chunk)
+                row = []
+                for item in chunk:
+                    row.append(chunk.decode('utf-8'))
+                print (",".join(row))
+
                 #FIXME check statement below
                 red.delete(key,chunk)
             key = self.instance +"_JOBS"
