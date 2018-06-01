@@ -347,6 +347,13 @@ class SQLIndex:
             ext = True
         if ext:
             sys.stdout.write("                                                    \r\n")
+
+    def term_job(self, job_id):
+        red = redis.Redis(host=self.redis_server, port=self.redis_port)
+        x = str(job_id)
+        key = self.instance + "_JOB_" + str(job_id)
+        return red.delete(key)
+
 #TODO add command line option to terminate a job
 parser = argparse.ArgumentParser(description="test for importing pcaps in sqlite3")
 parser.add_argument("--create", action='store_true')
@@ -373,6 +380,7 @@ parser.add_argument("--consume", type=str, nargs=1, required=False,
 parser.add_argument("--progress",type=str, nargs=1, required=False,
                     help="Show the progress of a given job given by a job_id")
 parser.add_argument("--config", type=str, nargs=1, required=True)
+parser.add_argument("--term", type=int, nargs=1, required=False)
 
 args = parser.parse_args()
 database=args.database
@@ -380,6 +388,11 @@ if database is not None:
     database = args.database[0]
 
 sqi = SQLIndex(database, args.config[0])
+
+if args.term:
+    job_id = args.term[0]
+    ret = sqi.term_job(job_id)
+    print ("terminate job " + str(job_id) + "  returned " + str(ret))
 
 if args.index:
     sqi.set_index = True
