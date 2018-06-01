@@ -320,7 +320,11 @@ class SQLIndex:
         #TODO Loop to create N workers
         self.log("Worker started")
         while True:
-            self.worker()
+            try:
+                self.worker()
+            except sqlite3.OperationalError as e:
+                syslog("Worker died." + str(e))
+
             #TODO check in redis what to do next?
             time.sleep(0.5)
 
