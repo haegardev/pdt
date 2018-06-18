@@ -50,7 +50,6 @@ void process_file(char* filename)
     char *errinfo;
     gint64 data_offset;
     const struct wtap_pkthdr *phdr;
-    struct pcap_pkthdr pchdr;
     int ethertype;
     guint8 *buf;
 
@@ -62,12 +61,7 @@ void process_file(char* filename)
         while (wtap_read(wth, &err, &errinfo, &data_offset)) {
             phdr = wtap_phdr(wth);
             buf = wtap_buf_ptr(wth);
-            pchdr.caplen = phdr->caplen;
-            pchdr.len = phdr->len;
-            pchdr.ts.tv_sec = phdr->ts.secs;
-            /* Need to convert micro to nano seconds */
-            pchdr.ts.tv_usec = phdr->ts.nsecs/1000;
-            if (pchdr.caplen < 14) {
+            if (phdr->caplen < 14) {
                 fprintf(stderr,"Packet too small, skip\n");
                 continue;
             }
