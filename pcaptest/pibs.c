@@ -40,6 +40,7 @@ void process_file(char* filename)
     gint64 data_offset;
     const struct wtap_pkthdr *phdr;
     struct pcap_pkthdr pchdr;
+    int ethertype;
     guint8 *buf;
 
     fprintf(stderr,"Processing %s\n",filename);
@@ -56,6 +57,14 @@ void process_file(char* filename)
             /* Need to convert micro to nano seconds */
             pchdr.ts.tv_usec = phdr->ts.nsecs/1000;
             printf("caplen %d\n",  pchdr.caplen);
+            if (pchdr.caplen < 14) {
+                fprintf(stderr,"Packet too small, skip\n");
+                continue;
+            }
+            ethertype = buf[12] << 8 | buf[13];
+            if (ethertype == 0x0800) {
+                printf("Ethertype: %x\n",ethertype);
+            }
         }
         wtap_close(wth);
 	fprintf(stderr,"[INFO] Processing of filename %s done\n",filename);
@@ -76,8 +85,6 @@ int main(int argc, char* argv[])
 {
 
     int opt;
-    int r;
-    pcap_t *pcap;
 
     init();
 
