@@ -45,15 +45,12 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
 {
     struct ip* ipv4;
     uint32_t x;
-    uint32_t b;
     if (length < sizeof(struct ip)) {
         return;
     }
     ipv4 =  (struct ip*)buf;
     memcpy(&x, &ipv4->ip_src, 4);
-    b = x % NBINS;
-    //pibs->bins[b]++;
-    printf("STAT %x %d\n",x,b);
+    pibs->bins[x % NBINS]++;
 }
 
 void process_file(pibs_t* pibs, char* filename)
@@ -81,7 +78,7 @@ void process_file(pibs_t* pibs, char* filename)
             ethertype = buf[12] << 8 | buf[13];
             // TODO Focus on IPv4 only
             if (ethertype == 0x0800) {
-                process_frame(NULL, phdr,buf+14, phdr->caplen-14);
+                process_frame(pibs, phdr,buf+14, phdr->caplen-14);
             }
         }
         wtap_close(wth);
