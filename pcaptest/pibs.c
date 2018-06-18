@@ -28,26 +28,35 @@
 #include <unistd.h>
 #include <signal.h>
 #include <netinet/ip.h>
+#include <netinet/in.h>
 
 #include <hiredis/hiredis.h>
+
+#define NBINS 1024
 
 typedef struct pibs_s {
     int errno;
     char *filename;
+    uint8_t bins[NBINS];
 } pibs_t;
 
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                    uint_fast8_t *buf, size_t length)
 {
     struct ip* ipv4;
+    uint32_t x;
+    uint32_t b;
     if (length < sizeof(struct ip)) {
         return;
     }
     ipv4 =  (struct ip*)buf;
-    printf("YYY %x\n", ipv4->ip_ttl);
+    memcpy(&x, &ipv4->ip_src, 4);
+    b = x % NBINS;
+    //pibs->bins[b]++;
+    printf("STAT %x %d\n",x,b);
 }
 
-void process_file(char* filename)
+void process_file(pibs_t* pibs, char* filename)
 {
     wtap *wth;
     int err;
@@ -90,11 +99,21 @@ void init(void)
 
 }
 
+void pibs_dump(pibs_t* pibs)
+{
+    int i;
+    for (i=0; i< NBINS; i++) {
+        printf("%d %d\n",i,pibs->bins[i]);
+    }
+}
+
 int main(int argc, char* argv[])
 {
 
     int opt;
+    pibs_t *pibs;
 
+    pibs=calloc(sizeof(pibs_t),1);
     init();
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
@@ -103,7 +122,8 @@ int main(int argc, char* argv[])
         switch (opt) {
             case 'r':
                 printf("Read pcap file\n");
-                process_file(optarg);
+                process_file(pibs, optarg);
+                pibs_dump(pibs);
                 break;
             default: /* '?' */
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
