@@ -30,7 +30,10 @@
 
 #include <hiredis/hiredis.h>
 
-
+typedef struct pibs_s {
+    int errno;
+    char *filename;
+} pibs_t;
 
 void process_file(char* filename)
 {
