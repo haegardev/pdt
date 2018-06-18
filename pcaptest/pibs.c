@@ -27,6 +27,7 @@
 #include <wtap.h>
 #include <unistd.h>
 #include <signal.h>
+#include <netinet/ip.h>
 
 #include <hiredis/hiredis.h>
 
@@ -37,8 +38,12 @@ typedef struct pibs_s {
 
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr, uint_fast8_t *buf)
 {
+    struct ip* ipv4;
     printf("TEST %x\n",buf[0]);
     printf("TEST %x\n",buf[1]);
+    ipv4 =  (struct ip*)buf;
+    printf("YYY %x\n", ipv4->ip_ttl);
+    printf("RRR %ld\n",sizeof(struct ip));
 }
 
 void process_file(char* filename)
