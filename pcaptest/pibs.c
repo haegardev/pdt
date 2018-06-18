@@ -32,6 +32,7 @@
 
 #include <hiredis/hiredis.h>
 
+//TODO test other values
 #define NBINS 1024
 
 typedef struct pibs_s {
