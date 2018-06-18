@@ -71,6 +71,7 @@ void process_file(char* filename)
                 continue;
             }
             ethertype = buf[12] << 8 | buf[13];
+            // TODO Focus on IPv4 only
             if (ethertype == 0x0800) {
                 process_frame(NULL, phdr,buf+14);
             }
