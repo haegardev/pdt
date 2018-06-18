@@ -35,6 +35,12 @@ typedef struct pibs_s {
     char *filename;
 } pibs_t;
 
+void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr, uint_fast8_t *buf)
+{
+    printf("TEST %x\n",buf[0]);
+    printf("TEST %x\n",buf[1]);
+}
+
 void process_file(char* filename)
 {
     wtap *wth;
@@ -66,7 +72,7 @@ void process_file(char* filename)
             }
             ethertype = buf[12] << 8 | buf[13];
             if (ethertype == 0x0800) {
-                printf("Ethertype: %x\n",ethertype);
+                process_frame(NULL, phdr,buf+14);
             }
         }
         wtap_close(wth);
