@@ -39,11 +39,8 @@ typedef struct pibs_s {
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr, uint_fast8_t *buf)
 {
     struct ip* ipv4;
-    printf("TEST %x\n",buf[0]);
-    printf("TEST %x\n",buf[1]);
     ipv4 =  (struct ip*)buf;
     printf("YYY %x\n", ipv4->ip_ttl);
-    printf("RRR %ld\n",sizeof(struct ip));
 }
 
 void process_file(char* filename)
@@ -70,7 +67,6 @@ void process_file(char* filename)
             pchdr.ts.tv_sec = phdr->ts.secs;
             /* Need to convert micro to nano seconds */
             pchdr.ts.tv_usec = phdr->ts.nsecs/1000;
-            printf("caplen %d\n",  pchdr.caplen);
             if (pchdr.caplen < 14) {
                 fprintf(stderr,"Packet too small, skip\n");
                 continue;
