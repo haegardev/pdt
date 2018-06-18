@@ -36,7 +36,8 @@ typedef struct pibs_s {
     char *filename;
 } pibs_t;
 
-void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr, uint_fast8_t *buf)
+void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
+                   uint_fast8_t *buf, size_t length)
 {
     struct ip* ipv4;
     ipv4 =  (struct ip*)buf;
@@ -68,7 +69,7 @@ void process_file(char* filename)
             ethertype = buf[12] << 8 | buf[13];
             // TODO Focus on IPv4 only
             if (ethertype == 0x0800) {
-                process_frame(NULL, phdr,buf+14);
+                process_frame(NULL, phdr,buf+14, phdr->caplen-14);
             }
         }
         wtap_close(wth);
