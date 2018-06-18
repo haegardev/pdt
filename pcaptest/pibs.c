@@ -38,6 +38,7 @@
 typedef struct pibs_s {
     int errno;
     char *filename;
+    //TODO use self contained data structure that can be easily serialized
     uint8_t bins[NBINS];
 } pibs_t;
 
