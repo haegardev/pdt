@@ -40,6 +40,9 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                    uint_fast8_t *buf, size_t length)
 {
     struct ip* ipv4;
+    if (length < sizeof(struct ip)) {
+        return;
+    }
     ipv4 =  (struct ip*)buf;
     printf("YYY %x\n", ipv4->ip_ttl);
 }
