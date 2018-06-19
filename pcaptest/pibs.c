@@ -35,6 +35,7 @@
 //TODO test other values
 #define NBINS 1024 //Number of bins
 #define NBINITEMS 255 //Number of items per bin
+#define SZBIN 4
 #define NBYTESBIN 8 // Number of bytes per bin
 #define NBINSCALE 2 // Scaling factor of the entire datastructure
 
@@ -43,8 +44,8 @@ typedef struct pibs_header_s {
     uint8_t magic [4];
     uint8_t version;
     //Put some useful stuff here
-    uint8_t padding [6];
-} pibs_header;
+    uint8_t padding [3];
+} pibs_header_t;
 
 /* Need to hash source IP addresses and record first seen and flags */
 typedef struct pibs_s {
@@ -54,6 +55,7 @@ typedef struct pibs_s {
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
     uint32_t next_block;
+    uint64_t data_size;
     uint8_t bins[NBINS];
 } pibs_t;
 
@@ -112,6 +114,17 @@ pibs_t* init(void)
 
     wtap_init();
     pibs=calloc(sizeof(pibs_t),1);
+    pibs->data_size = sizeof(pibs_header_t) + NBINSCALE * NBINS * SZBIN * NBINITEMS * NBYTESBIN;
+    pibs->data = calloc(pibs->data_size,1);
+    printf("Internal look up structure size in bytes: %ld\n",  pibs->data_size);
+    // Build header
+    pibs->data[0]='P';
+    pibs->data[1] = 'I';
+    pibs->data[2] = 'B';
+    pibs->data[3] = 'S';
+    pibs->data[4] = 1; //version 1
+    pibs->next_block = sizeof(pibs_header_t);
+    printf("Next block %d\n", pibs->next_block);
     return pibs;
 }
 
