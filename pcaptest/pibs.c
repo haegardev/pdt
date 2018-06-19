@@ -33,12 +33,17 @@
 #include <hiredis/hiredis.h>
 
 //TODO test other values
-#define NBINS 1024
+#define NBINS 1024 //Number of bins
+#define NBINITEMS 255 //Number of items per bin
+#define NBYTESBIN 8 // Number of bytes per bin
+#define NBINSCALE 2 // Scaling factor of the entire datastructure
 
+/* Need to hash source IP addresses and record first seen and flags */
 typedef struct pibs_s {
     int errno;
     char *filename;
     //TODO use self contained data structure that can be easily serialized
+    uint8_t *data;
     uint8_t bins[NBINS];
 } pibs_t;
 
