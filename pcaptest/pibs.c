@@ -98,11 +98,13 @@ void process_file(pibs_t* pibs, char* filename)
     }
 }
 
-void init(void)
+pibs_t* init(void)
 {
-    /* Update the start time */
-    wtap_init();
+    pibs_t *pibs;
 
+    wtap_init();
+    pibs=calloc(sizeof(pibs_t),1);
+    return pibs;
 }
 
 void pibs_dump(pibs_t* pibs)
@@ -118,10 +120,9 @@ int main(int argc, char* argv[])
 {
 
     int opt;
-    pibs_t *pibs;
+    pibs_t* pibs;
 
-    pibs=calloc(sizeof(pibs_t),1);
-    init();
+    pibs  = init();
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
