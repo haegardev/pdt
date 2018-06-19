@@ -55,8 +55,10 @@ typedef struct pibs_s {
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
     uint32_t next_block;
+    uint32_t bin_offset;
     uint64_t data_size;
     uint8_t bins[NBINS];
+    uint32_t* bin_table;
 } pibs_t;
 
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
@@ -69,7 +71,12 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     }
     ipv4 =  (struct ip*)buf;
     memcpy(&x, &ipv4->ip_src, 4);
+    if (!pibs->bin_table[x % NBINS]) {
+        printf("Observed first time %x\n",x);
+        pibs->next_block+=NBYTESBIN;
+    }
     pibs->bins[x % NBINS]++;
+    //TODO create struct for bins content  -> pointing to next one, timestamp
 }
 
 void process_file(pibs_t* pibs, char* filename)
@@ -124,6 +131,12 @@ pibs_t* init(void)
     pibs->data[3] = 'S';
     pibs->data[4] = 1; //version 1
     pibs->next_block = sizeof(pibs_header_t);
+    pibs->bin_offset = pibs->next_block;
+    printf("data address is %p\n",pibs->data);
+    pibs->bin_table = (uint32_t*)(pibs->data+pibs->bin_offset);
+    printf("bin_table address is %p\n", pibs->bin_table);
+    // Create bins
+    pibs->next_block+=SZBIN * NBINS;
     printf("Next block %d\n", pibs->next_block);
     return pibs;
 }
