@@ -101,6 +101,7 @@ void init(void)
 void pibs_dump(pibs_t* pibs)
 {
     int i;
+    printf("#Bin number, frequency\n");
     for (i=0; i< NBINS; i++) {
         printf("%d %d\n",i,pibs->bins[i]);
     }
