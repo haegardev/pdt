@@ -38,6 +38,14 @@
 #define NBYTESBIN 8 // Number of bytes per bin
 #define NBINSCALE 2 // Scaling factor of the entire datastructure
 
+
+typedef struct pibs_header_s {
+    uint8_t magic [4];
+    uint8_t version;
+    //Put some useful stuff here
+    uint8_t padding [6];
+} pibs_header;
+
 /* Need to hash source IP addresses and record first seen and flags */
 typedef struct pibs_s {
     int errno;
