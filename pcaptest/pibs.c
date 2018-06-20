@@ -47,6 +47,12 @@ typedef struct pibs_header_s {
     uint8_t padding [3];
 } pibs_header_t;
 
+typedef struct item_s {
+    uint32_t timestamp;
+    uint8_t tcp_flags;
+    uint32_t next_bucket;
+} item_t;
+
 /* Need to hash source IP addresses and record first seen and flags */
 typedef struct pibs_s {
     int errno;
