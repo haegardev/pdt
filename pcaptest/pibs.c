@@ -49,7 +49,8 @@ typedef struct pibs_header_s {
 typedef struct item_s {
     uint32_t timestamp;
     uint8_t tcp_flags;
-    uint32_t next_bucket;
+    uint32_t next_item;
+    uint32_t ipaddr;
 } item_t;
 
 /* Need to hash source IP addresses and record first seen and flags */
@@ -72,18 +73,43 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                    uint_fast8_t *buf, size_t length)
 {
     struct ip* ipv4;
+    uint32_t idx;
     uint32_t x;
+    uint32_t i;
+    uint8_t found;
     if (length < sizeof(struct ip)) {
         return;
     }
     ipv4 =  (struct ip*)buf;
     memcpy(&x, &ipv4->ip_src, 4);
-    if (!pibs->bin_table[x % NBINS]) {
+    idx = x  % NBINS;
+    printf("IP address value: %x\n", x);
+    printf("hashed value: %x\n", idx);
+    if (!pibs->bin_table[idx]) {
         printf("Observed first time %x\n",x);
-        pibs->next_block+=sizeof(item_t);
+        pibs->next_item++;
+        // FIXME check size
+        pibs->bin_table[idx] = pibs->next_item;
     }
-    pibs->bins[x % NBINS]++;
-    //TODO create struct for bins content  -> pointing to next one, timestamp
+    found = 0;
+    i = 0;
+    do {
+        printf("Iterating items: %d. next=%d\n",i,pibs->items[i].next_item);
+        if (pibs->items[i].ipaddr == x) {
+            printf("Found item %x\n",x);
+            //TODO Update other fields
+            found = 1;
+            break;
+        }
+        i++;
+    } while (pibs->items[i].next_item !=0);
+    //Insert new item
+    if (!found) {
+        pibs->next_item++;
+        printf("Insert new item %d at %d\n", pibs->next_item, i);
+        pibs->items[i].next_item = pibs->next_item;
+        pibs->items[i].ipaddr = x;
+    }
 }
 
 void process_file(pibs_t* pibs, char* filename)
@@ -146,6 +172,7 @@ pibs_t* init(void)
     pibs->next_block+=SZBIN * NBINS;
     printf("Next block %d\n", pibs->next_block);
     pibs->items = (item_t*)(pibs->data+pibs->next_block);
+    pibs->next_item = 0;
     printf("items are address %p\n", pibs->items);
     return pibs;
 }
