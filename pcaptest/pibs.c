@@ -83,8 +83,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     ipv4 =  (struct ip*)buf;
     memcpy(&x, &ipv4->ip_src, 4);
     idx = x  % NBINS;
-    printf("IP address value: %x\n", x);
-    printf("hashed value: %x\n", idx);
+    printf("Lookup IP address %x. Hashed value: %d\n", x, idx);
     if (!pibs->bin_table[idx]) {
         printf("Observed first time %x\n",x);
         pibs->next_item++;
@@ -94,16 +93,17 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     found = 0;
     i = 0;
     do {
-        printf("Iterating items: %d. next=%d\n",i,pibs->items[i].next_item);
+        printf("Iterating items at index %d. Current position: %d. Next position = %d\n",
+               idx,i,pibs->items[i].next_item);
         if (pibs->items[i].ipaddr == x) {
-            printf("Found item %x\n",x);
+            printf("Found item %x at position %d\n", x , i);
             //TODO Update other fields
             found = 1;
             break;
         }
         i++;
     } while (pibs->items[i].next_item !=0);
-    //Insert new item
+    //Insert new item if not found
     if (!found) {
         pibs->next_item++;
         printf("Insert new item %d at %d\n", pibs->next_item, i);
