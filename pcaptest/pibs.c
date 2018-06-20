@@ -90,6 +90,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                 pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
+        //TODO add values such as flags timestamp etc
     }
     found = 0;
     i = 0;
