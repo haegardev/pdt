@@ -85,8 +85,9 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     idx = x  % NBINS;
     printf("Lookup IP address %x. Hashed value: %d\n", x, idx);
     if (!pibs->bin_table[idx]) {
-        printf("Observed first time %x\n",x);
         pibs->next_item++;
+        printf("Observed first time %x. Created new item at position %d\n",x,\
+                pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
     }
