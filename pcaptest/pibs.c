@@ -90,11 +90,13 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                 pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
+        pibs->items[idx].ipaddr = x;
         //TODO add values such as flags timestamp etc
+        return;
     }
     found = 0;
     i = 0;
-    do {
+    while (pibs->items[i].next_item !=0) {
         printf("Iterating items at index %d. Current position: %d. Next position = %d\n",
                idx,i,pibs->items[i].next_item);
         if (pibs->items[i].ipaddr == x) {
@@ -104,7 +106,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
             break;
         }
         i++;
-    } while (pibs->items[i].next_item !=0);
+    }
     //Insert new item if not found
     if (!found) {
         pibs->next_item++;
