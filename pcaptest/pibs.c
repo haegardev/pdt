@@ -36,7 +36,6 @@
 #define NBINS 1024 //Number of bins
 #define NBINITEMS 255 //Number of items per bin
 #define SZBIN 4
-#define NBYTESBIN 8 // Number of bytes per bin
 #define NBINSCALE 2 // Scaling factor of the entire datastructure
 
 
@@ -61,10 +60,12 @@ typedef struct pibs_s {
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
     uint32_t next_block;
+    uint32_t next_item;
     uint32_t bin_offset;
     uint64_t data_size;
     uint8_t bins[NBINS];
     uint32_t* bin_table;
+    item_t* items;
 } pibs_t;
 
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
@@ -79,7 +80,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     memcpy(&x, &ipv4->ip_src, 4);
     if (!pibs->bin_table[x % NBINS]) {
         printf("Observed first time %x\n",x);
-        pibs->next_block+=NBYTESBIN;
+        pibs->next_block+=sizeof(item_t);
     }
     pibs->bins[x % NBINS]++;
     //TODO create struct for bins content  -> pointing to next one, timestamp
@@ -127,7 +128,7 @@ pibs_t* init(void)
 
     wtap_init();
     pibs=calloc(sizeof(pibs_t),1);
-    pibs->data_size = sizeof(pibs_header_t) + NBINSCALE * NBINS * SZBIN * NBINITEMS * NBYTESBIN;
+    pibs->data_size = sizeof(pibs_header_t) + NBINSCALE * NBINS * SZBIN * NBINITEMS * sizeof(item_t);
     pibs->data = calloc(pibs->data_size,1);
     printf("Internal look up structure size in bytes: %ld\n",  pibs->data_size);
     // Build header
@@ -144,6 +145,8 @@ pibs_t* init(void)
     // Create bins
     pibs->next_block+=SZBIN * NBINS;
     printf("Next block %d\n", pibs->next_block);
+    pibs->items = (item_t*)(pibs->data+pibs->next_block);
+    printf("items are address %p\n", pibs->items);
     return pibs;
 }
 
