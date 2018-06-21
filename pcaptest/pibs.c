@@ -91,6 +91,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
         pibs->items[idx].ipaddr = x;
+        printf("TEST Address of IP %p\n", &(pibs->items[idx].ipaddr));
+        printf("TEST next field %d\n",pibs->items[idx].next_item);
         //TODO add values such as flags timestamp etc
         return;
     }
@@ -99,6 +101,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     while (pibs->items[i].next_item !=0) {
         printf("Iterating items at index %d. Current position: %d. Next position = %d\n",
                idx,i,pibs->items[i].next_item);
+        printf("TEST Checking IP at address %p\n",&pibs->items[i]);
         if (pibs->items[i].ipaddr == x) {
             printf("Found item %x at position %d\n", x , i);
             //TODO Update other fields
