@@ -191,8 +191,10 @@ pibs_t* init(void)
 void pibs_dump(pibs_t* pibs)
 {
     int i;
-    printf("#Bin number, frequency\n");
-    for (i=0; i< NBINS; i++) {
+    printf("#Bin table\n");
+    printf("#Bin number, Item offset\n");
+    for (i=0; i < NBINS; i++) {
+        printf("%d %d\n", i, pibs->bin_table[i]);
     }
 }
 
