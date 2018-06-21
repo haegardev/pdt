@@ -100,7 +100,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     i = pibs->bin_table[idx];
     printf("Starting searching at position %d\n", i);
 
-    while (pibs->items[i].next_item !=0) {
+    do {
         printf("Iterating items at index %d. Current position: %d. Next position = %d\n",
                idx,i,pibs->items[i].next_item);
         printf("TEST Checking IP at address %p\n",&pibs->items[i]);
@@ -111,7 +111,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
             break;
         }
         i++;
-    }
+    } while (pibs->items[i].next_item !=0);
+
     //Insert new item if not found
     if (!found) {
         pibs->next_item++;
