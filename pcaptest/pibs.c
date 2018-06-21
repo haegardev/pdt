@@ -48,6 +48,11 @@ typedef struct pibs_header_s {
     uint8_t padding [3];
 } pibs_header_t;
 
+
+/* TODO This can squezed. Timestamp can be expressed on 8 bits i.e. relative
+ * minutes
+ * IP can be represented with 16 bits ipaddr = ip / bin_size
+ */
 typedef struct item_s {
     uint32_t timestamp;
     uint8_t tcp_flags;
