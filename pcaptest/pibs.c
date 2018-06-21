@@ -191,10 +191,18 @@ pibs_t* init(void)
 void pibs_dump(pibs_t* pibs)
 {
     int i;
+    int j;
+    int cnt;
     printf("#Bin table\n");
     printf("#Bin number, Item offset\n");
     for (i=0; i < NBINS; i++) {
-        printf("%d %d\n", i, pibs->bin_table[i]);
+        j = pibs->items[pibs->bin_table[i]].next_item;
+        cnt = 0;
+        while (j) {
+            cnt++;
+            j=pibs->items[j].next_item;
+        }
+        printf("%d %d %d\n", i, pibs->bin_table[i], cnt);
     }
 }
 
