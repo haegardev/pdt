@@ -66,7 +66,6 @@ typedef struct pibs_s {
     uint32_t next_item;
     uint32_t bin_offset;
     uint64_t data_size;
-    uint8_t bins[NBINS];
     uint32_t* bin_table;
     item_t* items;
 } pibs_t;
@@ -194,7 +193,6 @@ void pibs_dump(pibs_t* pibs)
     int i;
     printf("#Bin number, frequency\n");
     for (i=0; i< NBINS; i++) {
-        printf("%d %d\n",i,pibs->bins[i]);
     }
 }
 
