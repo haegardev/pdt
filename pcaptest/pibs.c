@@ -89,6 +89,10 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
 
 
     ipv4 =  (struct ip*)buf;
+    // Focus only on TCP packets
+    if (ipv4->ip_p != 6)
+        return;
+
     memcpy(&x, &ipv4->ip_src, 4);
     idx = x  % NBINS;
     HDBG("Lookup IP address %x. Hashed value: %d\n", x, idx);
