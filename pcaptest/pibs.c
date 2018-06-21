@@ -90,7 +90,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                 pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
-        pibs->items[idx].ipaddr = x;
+        pibs->items[pibs->next_item].ipaddr = x;
         printf("TEST Address of IP %p\n", &(pibs->items[idx].ipaddr));
         printf("TEST next field %d\n",pibs->items[idx].next_item);
         //TODO add values such as flags timestamp etc
