@@ -38,7 +38,7 @@
 #define SZBIN 4
 #define NBINSCALE 2 // Scaling factor of the entire datastructure
 
-#define HASHDEBUG 1
+#define HASHDEBUG 0
 #define HDBG(...) if (HASHDEBUG) fprintf(stderr, __VA_ARGS__)
 
 typedef struct pibs_header_s {
@@ -85,29 +85,29 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     ipv4 =  (struct ip*)buf;
     memcpy(&x, &ipv4->ip_src, 4);
     idx = x  % NBINS;
-    printf("Lookup IP address %x. Hashed value: %d\n", x, idx);
+    HDBG("Lookup IP address %x. Hashed value: %d\n", x, idx);
     if (!pibs->bin_table[idx]) {
         pibs->next_item++;
-        printf("Observed first time %x. Created new item at position %d\n",x,\
+        HDBG("Observed first time %x. Created new item at position %d\n",x,\
                 pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
         pibs->items[pibs->next_item].ipaddr = x;
-        printf("TEST Address of IP %p\n", &(pibs->items[idx].ipaddr));
-        printf("TEST next field %d\n",pibs->items[idx].next_item);
+        HDBG("Address of IP %p\n", &(pibs->items[idx].ipaddr));
+        HDBG("Next item %d\n",pibs->items[idx].next_item);
         //TODO add values such as flags timestamp etc
         return;
     }
     found = 0;
     i = pibs->bin_table[idx];
-    printf("Starting searching at position %d\n", i);
+    HDBG("Starting searching at position %d\n", i);
 
     do {
-        printf("Iterating items at index %d. Current position: %d. Next position = %d\n",
+        HDBG("Iterating items at index %d. Current position: %d. Next position = %d\n",
                idx,i,pibs->items[i].next_item);
-        printf("TEST Checking IP at address %p\n",&pibs->items[i]);
+        HDBG("Checking IP at address %p\n",&pibs->items[i]);
         if (pibs->items[i].ipaddr == x) {
-            printf("Found item %x at position %d\n", x , i);
+            HDBG("Found item %x at position %d\n", x , i);
             //TODO Update other fields
             found = 1;
             break;
@@ -118,7 +118,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     //Insert new item if not found
     if (!found) {
         pibs->next_item++;
-        printf("Insert new item %d at %d\n", pibs->next_item, i);
+        HDBG("Insert new item %d at %d\n", pibs->next_item, i);
         pibs->items[i].next_item = pibs->next_item;
         pibs->items[i].ipaddr = x;
     }
