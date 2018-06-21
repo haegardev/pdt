@@ -86,6 +86,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     if (length < sizeof(struct ip)) {
         return;
     }
+
+
     ipv4 =  (struct ip*)buf;
     memcpy(&x, &ipv4->ip_src, 4);
     idx = x  % NBINS;
@@ -97,6 +99,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
         pibs->items[pibs->next_item].ipaddr = x;
+        pibs->items[pibs->next_item].timestamp = phdr->ts.secs;
         HDBG("Address of IP %p\n", &(pibs->items[idx].ipaddr));
         HDBG("Next item %d\n",pibs->items[idx].next_item);
         //TODO add values such as flags timestamp etc
@@ -125,6 +128,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         HDBG("Insert new item %d at %d\n", pibs->next_item, i);
         pibs->items[i].next_item = pibs->next_item;
         pibs->items[i].ipaddr = x;
+        pibs->items[pibs->next_item].timestamp = phdr->ts.secs;
     }
 }
 
