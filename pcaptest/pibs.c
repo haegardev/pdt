@@ -193,6 +193,8 @@ void pibs_dump(pibs_t* pibs)
     int i;
     int j;
     int cnt;
+    uint64_t sum;
+    sum = 0;
     printf("#Bin table\n");
     printf("#Bin number, Item offset, number of items\n");
     for (i=0; i < NBINS; i++) {
@@ -202,8 +204,10 @@ void pibs_dump(pibs_t* pibs)
             cnt++;
             j=pibs->items[j].next_item;
         }
+        sum+=cnt;
         printf("%d %d %d\n", i, pibs->bin_table[i], cnt);
     }
+    printf("#Number of unique IP addresses: %ld\n", sum);
 }
 
 int main(int argc, char* argv[])
