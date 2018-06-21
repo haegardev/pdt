@@ -29,6 +29,7 @@
 #include <signal.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 
 #include <hiredis/hiredis.h>
 
@@ -79,10 +80,12 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                    uint_fast8_t *buf, size_t length)
 {
     struct ip* ipv4;
+    struct tcphdr* tcp;
     uint32_t idx;
     uint32_t x;
     uint32_t i;
     uint8_t found;
+
     if (length < sizeof(struct ip)) {
         return;
     }
@@ -92,6 +95,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     // Focus only on TCP packets
     if (ipv4->ip_p != 6)
         return;
+
+    tcp = (struct tcphdr*)(buf+sizeof(struct ip));
 
     memcpy(&x, &ipv4->ip_src, 4);
     idx = x  % NBINS;
@@ -104,9 +109,9 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         pibs->bin_table[idx] = pibs->next_item;
         pibs->items[pibs->next_item].ipaddr = x;
         pibs->items[pibs->next_item].timestamp = phdr->ts.secs;
+        pibs->items[pibs->next_item].tcp_flags = tcp->th_flags;
         HDBG("Address of IP %p\n", &(pibs->items[idx].ipaddr));
         HDBG("Next item %d\n",pibs->items[idx].next_item);
-        //TODO add values such as flags timestamp etc
         return;
     }
     found = 0;
@@ -119,7 +124,6 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         HDBG("Checking IP at address %p\n",&pibs->items[i]);
         if (pibs->items[i].ipaddr == x) {
             HDBG("Found item %x at position %d\n", x , i);
-            //TODO Update other fields
             found = 1;
             break;
         }
@@ -132,7 +136,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         HDBG("Insert new item %d at %d\n", pibs->next_item, i);
         pibs->items[i].next_item = pibs->next_item;
         pibs->items[i].ipaddr = x;
-        pibs->items[pibs->next_item].timestamp = phdr->ts.secs;
+        pibs->items[i].timestamp = phdr->ts.secs;
+        pibs->items[i].tcp_flags = tcp->th_flags;
     }
 }
 
