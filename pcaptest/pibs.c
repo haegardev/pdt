@@ -76,15 +76,58 @@ typedef struct pibs_s {
     item_t* items;
 } pibs_t;
 
+void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
+{
+    uint32_t idx;
+    uint32_t i;
+    uint8_t found;
+
+    idx = ip  % NBINS;
+    HDBG("Lookup IP address %x. Hashed value: %d\n", ip, idx);
+    if (!pibs->bin_table[idx]) {
+        pibs->next_item++;
+        HDBG("Observed first time %x. Created new item at position %d\n",ip,\
+                pibs->next_item);
+        // FIXME check size
+        pibs->bin_table[idx] = pibs->next_item;
+        pibs->items[pibs->next_item].ipaddr = ip;
+        pibs->items[pibs->next_item].timestamp = ts;
+        HDBG("Address of IP %p\n", &(pibs->items[idx].ipaddr));
+        HDBG("Next item %d\n",pibs->items[idx].next_item);
+        return;
+    }
+    found = 0;
+    i = pibs->bin_table[idx];
+    HDBG("Starting searching at position %d\n", i);
+
+    do {
+        HDBG("Iterating items at index %d. Current position: %d. Next position = %d\n",
+               idx,i,pibs->items[i].next_item);
+        HDBG("Checking IP at address %p\n",&pibs->items[i]);
+        if (pibs->items[i].ipaddr == ip) {
+            HDBG("Found item %x at position %d\n", ip , i);
+            found = 1;
+            break;
+        }
+        i++;
+    } while (pibs->items[i].next_item !=0);
+
+    //Insert new item if not found
+    if (!found) {
+        pibs->next_item++;
+        HDBG("Insert new item %d at %d\n", pibs->next_item, i);
+        pibs->items[i].next_item = pibs->next_item;
+        pibs->items[i].ipaddr = ip;
+        pibs->items[i].timestamp = ts;
+    }
+}
+
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                    uint_fast8_t *buf, size_t length)
 {
     struct ip* ipv4;
+    uint32_t ip;
     struct tcphdr* tcp;
-    uint32_t idx;
-    uint32_t x;
-    uint32_t i;
-    uint8_t found;
 
     if (length < sizeof(struct ip)) {
         return;
@@ -98,47 +141,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
 
     tcp = (struct tcphdr*)(buf+sizeof(struct ip));
 
-    memcpy(&x, &ipv4->ip_src, 4);
-    idx = x  % NBINS;
-    HDBG("Lookup IP address %x. Hashed value: %d\n", x, idx);
-    if (!pibs->bin_table[idx]) {
-        pibs->next_item++;
-        HDBG("Observed first time %x. Created new item at position %d\n",x,\
-                pibs->next_item);
-        // FIXME check size
-        pibs->bin_table[idx] = pibs->next_item;
-        pibs->items[pibs->next_item].ipaddr = x;
-        pibs->items[pibs->next_item].timestamp = phdr->ts.secs;
-        pibs->items[pibs->next_item].tcp_flags = tcp->th_flags;
-        HDBG("Address of IP %p\n", &(pibs->items[idx].ipaddr));
-        HDBG("Next item %d\n",pibs->items[idx].next_item);
-        return;
-    }
-    found = 0;
-    i = pibs->bin_table[idx];
-    HDBG("Starting searching at position %d\n", i);
-
-    do {
-        HDBG("Iterating items at index %d. Current position: %d. Next position = %d\n",
-               idx,i,pibs->items[i].next_item);
-        HDBG("Checking IP at address %p\n",&pibs->items[i]);
-        if (pibs->items[i].ipaddr == x) {
-            HDBG("Found item %x at position %d\n", x , i);
-            found = 1;
-            break;
-        }
-        i++;
-    } while (pibs->items[i].next_item !=0);
-
-    //Insert new item if not found
-    if (!found) {
-        pibs->next_item++;
-        HDBG("Insert new item %d at %d\n", pibs->next_item, i);
-        pibs->items[i].next_item = pibs->next_item;
-        pibs->items[i].ipaddr = x;
-        pibs->items[i].timestamp = phdr->ts.secs;
-        pibs->items[i].tcp_flags = tcp->th_flags;
-    }
+    memcpy(&ip, &ipv4->ip_src, 4);
+    insert_ip(pibs, ip, phdr->ts.secs);
 }
 
 void process_file(pibs_t* pibs, char* filename)
