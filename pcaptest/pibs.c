@@ -142,7 +142,11 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     tcp = (struct tcphdr*)(buf+sizeof(struct ip));
 
     memcpy(&ip, &ipv4->ip_src, 4);
+    //FIXME insert only if SYN is set
     insert_ip(pibs, ip, phdr->ts.secs);
+    //TODO relative time
+    //Do lookup for non SYN flags if SYN was set
+    //Purge old ips?
 }
 
 void process_file(pibs_t* pibs, char* filename)
