@@ -182,6 +182,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
                , ip, inet_ntoa(ipv4->ip_src), lastseen, phdr->ts.secs-lastseen);
         return;
     }
+    // TODO keep these IPs in a hashtable and rank them
     printf("Potential backscatter. IP. %s. TCP flags: %d. Source port:%d \n",
            inet_ntoa(ipv4->ip_src), tcp->th_flags, ntohs(tcp->th_sport));
     //TODO relative time
