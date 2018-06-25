@@ -86,7 +86,7 @@ int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
     uint32_t i;
 
     idx = ip % NBINS;
-    HDBG("[TS] idx = %d\n", idx);
+    HDBG("[TS] Checking for IP %x at index = %d\n", ip, idx);
     if (!pibs->bin_table[idx]){
     i = pibs->bin_table[idx];
         do {
