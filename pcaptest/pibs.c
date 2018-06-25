@@ -30,7 +30,8 @@
 #include <netinet/ip.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-
+#include <arpa/inet.h>
+#include <sys/socket.h>
 #include <hiredis/hiredis.h>
 
 //TODO test other values
@@ -168,7 +169,6 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     tcp = (struct tcphdr*)(buf+sizeof(struct ip));
 
     memcpy(&ip, &ipv4->ip_src, 4);
-
     // Record only source ips where syn flag is set
     // TODO check other connection establishment alternatives
     if (tcp->th_flags  == 2 ){
@@ -179,7 +179,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     lastseen =  get_last_timestamp(pibs, ip);
 
     if (lastseen > 0){
-        printf("IP %x was already seen before at %ld\n", ip, lastseen);
+        HDBG("IP %x %s was already seen before at %ld. Time difference %ld.\n"
+               , ip, inet_ntoa(ipv4->ip_src), lastseen, phdr->ts.secs-lastseen);
     }
     //TODO relative time
     //Purge old ips?
