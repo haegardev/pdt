@@ -107,29 +107,29 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
     uint8_t found;
 
     idx = ip  % NBINS;
-    HDBG("Lookup IP address %x. Hashed value: %d\n", ip, idx);
+    HDBG("[INS] Lookup IP address %x. Hashed value: %d\n", ip, idx);
     if (!pibs->bin_table[idx]) {
         pibs->next_item++;
-        HDBG("Observed first time %x. Created new item at position %d\n",ip,\
+        HDBG("[INS] Observed first time %x. Created new item at position %d\n",ip,\
                 pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
         pibs->items[pibs->next_item].ipaddr = ip;
         pibs->items[pibs->next_item].timestamp = ts;
-        HDBG("Address of IP %p\n", &(pibs->items[idx].ipaddr));
-        HDBG("Next item %d\n",pibs->items[idx].next_item);
+        HDBG("[INS] Address of IP %p\n", &(pibs->items[idx].ipaddr));
+        HDBG("[INS] Next item %d\n",pibs->items[idx].next_item);
         return;
     }
     found = 0;
     i = pibs->bin_table[idx];
-    HDBG("Starting searching at position %d\n", i);
+    HDBG("[INS] Starting searching at position %d\n", i);
 
     do {
-        HDBG("Iterating items at index %d. Current position: %d. Next position = %d\n",
+        HDBG("[INS] Iterating items at index %d. Current position: %d. Next position = %d\n",
                idx,i,pibs->items[i].next_item);
-        HDBG("Checking IP at address %p\n",&pibs->items[i]);
+        HDBG("[INS] Checking IP at address %p\n",&pibs->items[i]);
         if (pibs->items[i].ipaddr == ip) {
-            HDBG("Found item %x at position %d\n", ip , i);
+            HDBG("[INS] Found item %x at position %d\n", ip , i);
             found = 1;
             break;
         }
@@ -139,7 +139,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
     //Insert new item if not found
     if (!found) {
         pibs->next_item++;
-        HDBG("Insert new item %d at %d\n", pibs->next_item, i);
+        HDBG("[INS] Insert new item %d at %d\n", pibs->next_item, i);
         pibs->items[i].next_item = pibs->next_item;
         pibs->items[i].ipaddr = ip;
         pibs->items[i].timestamp = ts;
