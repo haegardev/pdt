@@ -142,8 +142,12 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     tcp = (struct tcphdr*)(buf+sizeof(struct ip));
 
     memcpy(&ip, &ipv4->ip_src, 4);
-    //FIXME insert only if SYN is set
-    insert_ip(pibs, ip, phdr->ts.secs);
+
+    // Record only source ips where syn flag is set
+    if ((tcp->th_flags  & 2 )){
+        insert_ip(pibs, ip, phdr->ts.secs);
+        return;
+    }
     //TODO relative time
     //Do lookup for non SYN flags if SYN was set
     //Purge old ips?
