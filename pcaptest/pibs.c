@@ -40,7 +40,6 @@
 #define SZBIN 4
 #define NBINSCALE 2 // Scaling factor of the entire datastructure
 
-#define HASHDEBUG 1
 #define HDBG(...) if (HASHDEBUG) fprintf(stderr, __VA_ARGS__)
 
 typedef struct pibs_header_s {
