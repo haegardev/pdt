@@ -94,7 +94,7 @@ int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
                 HDBG("[TS] Found item %x at position %d\n", ip , i);
                 return pibs->items[i].timestamp;
             }
-            i++;
+            i = pibs->items[i].next_item;
         } while (pibs->items[i].next_item !=0);
     }
     HDBG("[TS] IP: %x was not found return -1\n",ip);
@@ -134,7 +134,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
             found = 1;
             break;
         }
-        i++;
+        i = pibs->items[i].next_item;
     } while (pibs->items[i].next_item !=0);
 
     //Insert new item if not found
