@@ -76,6 +76,30 @@ typedef struct pibs_s {
     item_t* items;
 } pibs_t;
 
+/*
+ * Returns -1 if not found
+ * returns last timestamp if found
+ */
+int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
+{
+    uint32_t idx;
+    uint32_t i;
+
+    idx = ip % NBINS;
+    if (!pibs->bin_table[idx]){
+    i = pibs->bin_table[idx];
+        do {
+            if (pibs->items[i].ipaddr == ip) {
+                HDBG("Found item %x at position %d\n", ip , i);
+                return pibs->items[i].timestamp;
+            }
+            i++;
+        } while (pibs->items[i].next_item !=0);
+    }
+    HDBG("IP: %x was not found return -1\n",ip);
+    return -1;
+}
+
 void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
 {
     uint32_t idx;
@@ -128,6 +152,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     struct ip* ipv4;
     uint32_t ip;
     struct tcphdr* tcp;
+    int_fast64_t lastseen;
 
     if (length < sizeof(struct ip)) {
         return;
@@ -148,8 +173,13 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         insert_ip(pibs, ip, phdr->ts.secs);
         return;
     }
+
+    lastseen =  get_last_timestamp(pibs, ip);
+
+    if (lastseen > 0){
+        printf("IP %x was already seen before at %ld\n", ip, lastseen);
+    }
     //TODO relative time
-    //Do lookup for non SYN flags if SYN was set
     //Purge old ips?
 }
 
