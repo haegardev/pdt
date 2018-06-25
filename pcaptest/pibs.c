@@ -170,7 +170,8 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     memcpy(&ip, &ipv4->ip_src, 4);
 
     // Record only source ips where syn flag is set
-    if ((tcp->th_flags  & 2 )){
+    // TODO check other connection establishment alternatives
+    if (tcp->th_flags  == 2 ){
         insert_ip(pibs, ip, phdr->ts.secs);
         return;
     }
