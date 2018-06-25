@@ -180,7 +180,10 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     if (lastseen > 0){
         HDBG("IP %x %s was already seen before at %ld. Time difference %ld.\n"
                , ip, inet_ntoa(ipv4->ip_src), lastseen, phdr->ts.secs-lastseen);
+        return;
     }
+    printf("Potential backscatter. IP. %s. TCP flags: %d. Source port:%d \n",
+           inet_ntoa(ipv4->ip_src), tcp->th_flags, ntohs(tcp->th_sport));
     //TODO relative time
     //Purge old ips?
 }
