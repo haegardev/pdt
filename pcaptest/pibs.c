@@ -87,8 +87,8 @@ int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
 
     idx = ip % NBINS;
     HDBG("[TS] Checking for IP %x at index = %d\n", ip, idx);
-    if (!pibs->bin_table[idx]){
     i = pibs->bin_table[idx];
+    if (i){
         do {
             if (pibs->items[i].ipaddr == ip) {
                 HDBG("[TS] Found item %x at position %d\n", ip , i);
