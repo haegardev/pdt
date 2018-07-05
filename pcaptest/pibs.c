@@ -149,7 +149,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
 }
 
 void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
-                   uint_fast8_t *buf, size_t length)
+                   uint8_t *buf, size_t length)
 {
     struct ip* ipv4;
     uint32_t ip;
