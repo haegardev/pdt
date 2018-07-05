@@ -35,7 +35,7 @@
 #include <hiredis/hiredis.h>
 
 //TODO test other values
-#define NBINS 1024 //Number of bins
+#define NBINS 65536 //Number of bins
 #define NBINITEMS 255 //Number of items per bin
 #define SZBIN 4
 #define NBINSCALE 2 // Scaling factor of the entire datastructure
@@ -50,15 +50,14 @@ typedef struct pibs_header_s {
 } pibs_header_t;
 
 
-/* TODO This can squezed. Timestamp can be expressed on 8 bits i.e. relative
- * minutes
- * IP can be represented with 16 bits ipaddr = ip / bin_size
- */
+ /*
+  * IP can be represented with 16 bits ipaddr = ip / bin_size
+  */
 typedef struct item_s {
     uint32_t timestamp;
     uint8_t tcp_flags;
     uint32_t next_item;
-    uint32_t ipaddr;
+    uint16_t ipaddr;
 } item_t;
 
 /* Need to hash source IP addresses and record first seen and flags */
@@ -84,13 +83,15 @@ int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
 {
     uint32_t idx;
     uint32_t i;
+    uint16_t r;
 
     idx = ip % NBINS;
-    HDBG("[TS] Checking for IP %x at index = %d\n", ip, idx);
+    r = ip / NBINS;
+    HDBG("[TS] Checking for IP %x at index = %d. r=%x\n", ip, idx, r);
     i = pibs->bin_table[idx];
     if (i){
         do {
-            if (pibs->items[i].ipaddr == ip) {
+            if (pibs->items[i].ipaddr == r) {
                 HDBG("[TS] Found item %x at position %d\n", ip , i);
                 return pibs->items[i].timestamp;
             }
@@ -106,8 +107,11 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
     uint32_t idx;
     uint32_t i;
     uint8_t found;
+    uint16_t r;
 
     idx = ip  % NBINS;
+    r = ip / NBINS;
+
     HDBG("[INS] Lookup IP address %x. Hashed value: %d\n", ip, idx);
     if (!pibs->bin_table[idx]) {
         pibs->next_item++;
@@ -115,7 +119,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
                 pibs->next_item);
         // FIXME check size
         pibs->bin_table[idx] = pibs->next_item;
-        pibs->items[pibs->next_item].ipaddr = ip;
+        pibs->items[pibs->next_item].ipaddr = r;
         pibs->items[pibs->next_item].timestamp = ts;
         HDBG("[INS] Address of IP %p\n", &(pibs->items[idx].ipaddr));
         HDBG("[INS] Next item %d\n",pibs->items[idx].next_item);
@@ -129,7 +133,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
         HDBG("[INS] Iterating items at index %d. Current position: %d. Next position = %d\n",
                idx,i,pibs->items[i].next_item);
         HDBG("[INS] Checking IP at address %p\n",&pibs->items[i]);
-        if (pibs->items[i].ipaddr == ip) {
+        if (pibs->items[i].ipaddr == r) {
             HDBG("[INS] Found item %x at position %d\n", ip , i);
             found = 1;
             break;
@@ -142,7 +146,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
         pibs->next_item++;
         HDBG("[INS] Insert new item %d at %d\n", pibs->next_item, i);
         pibs->items[i].next_item = pibs->next_item;
-        pibs->items[i].ipaddr = ip;
+        pibs->items[i].ipaddr = r;
         pibs->items[i].timestamp = ts;
     }
 }
