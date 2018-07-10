@@ -250,7 +250,7 @@ pibs_t* init(void)
     pibs->next_block+=SZBIN * NBINS;
     printf("Next block %d\n", pibs->next_block);
     pibs->items = (item_t*)(pibs->data+pibs->next_block);
-    pibs->next_item = 0;
+    pibs->next_item = 1;
     printf("items are address %p\n", pibs->items);
     return pibs;
 }
