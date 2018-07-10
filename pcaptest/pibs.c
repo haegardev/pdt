@@ -255,6 +255,21 @@ pibs_t* init(void)
     return pibs;
 }
 
+void pibs_dump_raw(pibs_t* pibs)
+{
+    int i;
+    printf("#RAW table dump\n");
+    printf("#Index next_item\n");
+    printf("#BINs\n");
+    for (i=0; i< NBINS; i++) {
+        printf("%d  %d\n", i, pibs->bin_table[i]);
+    }
+    printf("#ITEMS\n");
+    for (i=0; i < NBINITEMS * NBINS; i++) {
+        printf("%d %d\n", i, pibs->items[i].next_item);
+    }
+}
+
 void pibs_dump(pibs_t* pibs)
 {
     int i;
@@ -292,7 +307,7 @@ int main(int argc, char* argv[])
             case 'r':
                 printf("Read pcap file\n");
                 process_file(pibs, optarg);
-                pibs_dump(pibs);
+                pibs_dump_raw(pibs);
                 break;
             default: /* '?' */
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
