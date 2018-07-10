@@ -66,6 +66,8 @@ typedef struct item_s {
 typedef struct pibs_s {
     int errno;
     char *filename;
+    int should_dump_table;
+    int show_backscatter;
     //TODO use self contained data structure that can be easily serialized
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
@@ -190,7 +192,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     //Purge old ips?
 }
 
-void process_file(pibs_t* pibs, char* filename)
+void process_file(pibs_t* pibs)
 {
     wtap *wth;
     int err;
@@ -200,8 +202,8 @@ void process_file(pibs_t* pibs, char* filename)
     int ethertype;
     guint8 *buf;
 
-    fprintf(stderr,"Processing %s\n",filename);
-    wth = wtap_open_offline ( filename, WTAP_TYPE_AUTO, (int*)&err,
+    fprintf(stderr,"Processing %s\n",pibs->filename);
+    wth = wtap_open_offline ( pibs->filename, WTAP_TYPE_AUTO, (int*)&err,
                              (char**)&errinfo, FALSE);
     if (wth) {
         /* Loop over the packets and adjust the headers */
@@ -219,9 +221,9 @@ void process_file(pibs_t* pibs, char* filename)
             }
         }
         wtap_close(wth);
-	fprintf(stderr,"[INFO] Processing of filename %s done\n",filename);
+	fprintf(stderr,"[INFO] Processing of filename %s done\n",pibs->filename);
     }else{
-        fprintf(stderr, "[ERROR] Could not open filename %s,cause=%s\n",filename,
+        fprintf(stderr, "[ERROR] Could not open filename %s,cause=%s\n",pibs->filename,
                 wtap_strerror(err));
     }
 }
@@ -234,6 +236,7 @@ pibs_t* init(void)
     pibs=calloc(sizeof(pibs_t),1);
     pibs->data_size = sizeof(pibs_header_t) + NBINSCALE * NBINS * SZBIN * NBINITEMS * sizeof(item_t);
     pibs->data = calloc(pibs->data_size,1);
+    pibs->filename = calloc(FILENAME_MAX,1);
     printf("Internal look up structure size in bytes: %ld\n",  pibs->data_size);
     // Build header
     pibs->data[0]='P';
@@ -305,17 +308,23 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
-    while ((opt = getopt(argc, argv, "r:")) != -1) {
+    while ((opt = getopt(argc, argv, "r:d")) != -1) {
         switch (opt) {
             case 'r':
-                printf("Read pcap file\n");
-                process_file(pibs, optarg);
-                pibs_dump_raw(pibs);
+                strncpy(pibs->filename, optarg, FILENAME_MAX);
+                break;
+            case 'd':
+                pibs->should_dump_table = 1;
                 break;
             default: /* '?' */
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
         }
     }
-
+    if (pibs->filename[0]) {
+        process_file(pibs);
+    }
+    if (pibs->should_dump_table){
+        pibs_dump_raw(pibs);
+    }
     return EXIT_FAILURE;
 }
