@@ -265,8 +265,11 @@ void pibs_dump_raw(pibs_t* pibs)
         printf("%d  %d\n", i, pibs->bin_table[i]);
     }
     printf("#ITEMS\n");
+    printf("#Index next_item, timestamp, ipaddr\n");
     for (i=0; i < NBINITEMS * NBINS; i++) {
-        printf("%d %d\n", i, pibs->items[i].next_item);
+        printf("%d %d %d %x\n", i, pibs->items[i].next_item,
+                                 pibs->items[i].timestamp,
+                                 pibs->items[i].ipaddr);
     }
 }
 
