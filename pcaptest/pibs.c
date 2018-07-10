@@ -68,6 +68,7 @@ typedef struct pibs_s {
     char *filename;
     int should_dump_table;
     int show_backscatter;
+    int show_stats;
     //TODO use self contained data structure that can be easily serialized
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
@@ -278,7 +279,7 @@ void pibs_dump_raw(pibs_t* pibs)
     }
 }
 
-void pibs_dump(pibs_t* pibs)
+void pibs_dump_stats(pibs_t* pibs)
 {
     int i;
     int j;
@@ -310,7 +311,7 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
-    while ((opt = getopt(argc, argv, "r:db")) != -1) {
+    while ((opt = getopt(argc, argv, "r:dbs")) != -1) {
         switch (opt) {
             case 'r':
                 strncpy(pibs->filename, optarg, FILENAME_MAX);
@@ -321,6 +322,9 @@ int main(int argc, char* argv[])
             case 'b':
                 pibs->show_backscatter = 1;
                 break;
+            case 's':
+                pibs->show_stats = 1;
+                break;
             default: /* '?' */
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
         }
@@ -330,6 +334,9 @@ int main(int argc, char* argv[])
     }
     if (pibs->should_dump_table){
         pibs_dump_raw(pibs);
+    }
+    if (pibs->show_stats){
+        pibs_dump_stats(pibs);
     }
     return EXIT_FAILURE;
 }
