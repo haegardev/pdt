@@ -186,8 +186,10 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
         return;
     }
     // TODO keep these IPs in a hashtable and rank them
-    printf("Potential backscatter. IP. %s. TCP flags: %d. Source port:%d \n",
-           inet_ntoa(ipv4->ip_src), tcp->th_flags, ntohs(tcp->th_sport));
+    if (pibs->show_backscatter) {
+        printf("Potential backscatter. IP. %s. TCP flags: %d. Source port:%d \n",
+               inet_ntoa(ipv4->ip_src), tcp->th_flags, ntohs(tcp->th_sport));
+    }
     //TODO relative time
     //Purge old ips?
 }
@@ -308,13 +310,16 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
-    while ((opt = getopt(argc, argv, "r:d")) != -1) {
+    while ((opt = getopt(argc, argv, "r:db")) != -1) {
         switch (opt) {
             case 'r':
                 strncpy(pibs->filename, optarg, FILENAME_MAX);
                 break;
             case 'd':
                 pibs->should_dump_table = 1;
+                break;
+            case 'b':
+                pibs->show_backscatter = 1;
                 break;
             default: /* '?' */
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
