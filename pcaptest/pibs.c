@@ -126,7 +126,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
             if (pibs->items[i].ipaddr == ip) {
                HDBG("[INS] Found item %x at position %d\n", ip , i);
                HDBG("[INS] New timestamp for ip %x is %d\n",ip,ts);
-               pibs->items[pibs->next_item].timestamp = ts;
+               pibs->items[i].timestamp = ts;
                return;
             }
             parent = i;
