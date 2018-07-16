@@ -131,7 +131,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
             }
             parent = i;
             i = pibs->items[i].next_item;
-        } while (pibs->items[i].next_item !=0);
+        } while (i != 0 );
         HDBG("[INS] The IP %x was not found in the item list, last parent %d\n",
               ip, parent);
     }
