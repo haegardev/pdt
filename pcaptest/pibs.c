@@ -88,7 +88,8 @@ int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
 {
     uint32_t idx;
     uint32_t i;
-
+    //TODO explore alternative hashing functions
+    //https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key/12996028#12996028
     idx = ip % NBINS;
     HDBG("[TS] Checking for IP %x at index = %d\n", ip, idx);
     i = pibs->bin_table[idx];
