@@ -109,45 +109,45 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
 {
     uint32_t idx;
     uint32_t i;
-    uint8_t found;
+    uint32_t parent;
 
     idx = ip  % NBINS;
     HDBG("[INS] Lookup IP address %x. Hashed value: %d\n", ip, idx);
-    if (!pibs->bin_table[idx]) {
-        pibs->next_item++;
-        HDBG("[INS] Observed first time %x. Created new item at position %d\n",ip,\
-                pibs->next_item);
-        // FIXME check size
-        pibs->bin_table[idx] = pibs->next_item;
-        pibs->items[pibs->next_item].ipaddr = ip;
-        pibs->items[pibs->next_item].timestamp = ts;
-        HDBG("[INS] Address of IP %p\n", &(pibs->items[idx].ipaddr));
-        HDBG("[INS] Next item %d\n",pibs->items[idx].next_item);
-        return;
+    parent = 0;
+    if (pibs->bin_table[idx]){
+        // There is already someone in the bin
+        i = pibs->bin_table[idx];
+        HDBG("[INS] Starting searching at position %d\n", i);
+        do {
+            HDBG("[INS] Iterating items at index %d. Current position: %d.\
+                  Next position = %d\n",
+                 idx,i,pibs->items[i].next_item);
+            HDBG("[INS] Checking IP at address %p\n",&pibs->items[i]);
+            if (pibs->items[i].ipaddr == ip) {
+               HDBG("[INS] Found item %x at position %d\n", ip , i);
+               HDBG("[INS] New timestamp for ip %x is %d\n",ip,ts);
+               pibs->items[pibs->next_item].timestamp = ts;
+               return;
+            }
+            parent = i;
+            i = pibs->items[i].next_item;
+        } while (pibs->items[i].next_item !=0);
+        HDBG("[INS] The IP %x was not found in the item list, last parent %d\n",
+              ip, parent);
     }
-    found = 0;
-    i = pibs->bin_table[idx];
-    HDBG("[INS] Starting searching at position %d\n", i);
-
-    do {
-        HDBG("[INS] Iterating items at index %d. Current position: %d. Next position = %d\n",
-               idx,i,pibs->items[i].next_item);
-        HDBG("[INS] Checking IP at address %p\n",&pibs->items[i]);
-        if (pibs->items[i].ipaddr == ip) {
-            HDBG("[INS] Found item %x at position %d\n", ip , i);
-            found = 1;
-            break;
-        }
-        i = pibs->items[i].next_item;
-    } while (pibs->items[i].next_item !=0);
-
-    //Insert new item if not found
-    if (!found) {
-        pibs->next_item++;
-        HDBG("[INS] Insert new item %d at %d\n", pibs->next_item, i);
-        pibs->items[i].next_item = pibs->next_item;
-        pibs->items[i].ipaddr = ip;
-        pibs->items[i].timestamp = ts;
+    // The IP was not found in an item list or the hashed value wsa not present
+    // in the bin table, so create a new item
+    //FIXME check if there is room
+    pibs->next_item++;
+    if (pibs->bin_table[idx] == 0) {
+        pibs->bin_table[idx] = pibs->next_item;
+    }
+    HDBG("[INS] Insert ip %x at position %d, parent = %d\n", ip,
+         pibs->next_item,parent);
+    pibs->items[pibs->next_item].ipaddr = ip;
+    pibs->items[pibs->next_item].timestamp = ts;
+    if (parent) {
+        pibs->items[parent].next_item = pibs->next_item;
     }
 }
 
@@ -256,7 +256,7 @@ pibs_t* init(void)
     pibs->next_block+=SZBIN * NBINS;
     printf("Next block %d\n", pibs->next_block);
     pibs->items = (item_t*)(pibs->data+pibs->next_block);
-    pibs->next_item = 1;
+    pibs->next_item = 0;
     printf("items are address %p\n", pibs->items);
     return pibs;
 }
