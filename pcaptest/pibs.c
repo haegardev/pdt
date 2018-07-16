@@ -92,14 +92,12 @@ int_fast64_t get_last_timestamp(pibs_t* pibs, uint32_t ip)
     idx = ip % NBINS;
     HDBG("[TS] Checking for IP %x at index = %d\n", ip, idx);
     i = pibs->bin_table[idx];
-    if (i){
-        do {
-            if (pibs->items[i].ipaddr == ip) {
-                HDBG("[TS] Found item %x at position %d\n", ip , i);
+    while (i){
+        if (pibs->items[i].ipaddr == ip) {
+            HDBG("[TS] Found item %x at position %d\n", ip , i);
                 return pibs->items[i].timestamp;
             }
-            i = pibs->items[i].next_item;
-        } while (pibs->items[i].next_item !=0);
+        i = pibs->items[i].next_item;
     }
     HDBG("[TS] IP: %x was not found return -1\n",ip);
     return -1;
