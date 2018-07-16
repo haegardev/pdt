@@ -138,6 +138,8 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
     pibs->next_item++;
     if (pibs->next_item > pibs->max_item) {
         printf("FIXME run out of memory. Do something better than abort\n");
+        //Go through old timestamps and keep linked list of stuff that can be
+        //reused or do kind of defragmentation
         abort();
     }
     if (pibs->bin_table[idx] == 0) {
