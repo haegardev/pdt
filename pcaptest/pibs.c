@@ -57,7 +57,6 @@ typedef struct pibs_header_s {
  */
 typedef struct item_s {
     uint32_t timestamp;
-    uint8_t tcp_flags;
     uint32_t next_item;
     uint32_t ipaddr;
 } item_t;
