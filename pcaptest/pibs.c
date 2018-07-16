@@ -77,6 +77,7 @@ typedef struct pibs_s {
     uint32_t bin_offset;
     uint64_t data_size;
     uint32_t* bin_table;
+    uint32_t max_item;
     item_t* items;
 } pibs_t;
 
@@ -135,8 +136,11 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
     }
     // The IP was not found in an item list or the hashed value wsa not present
     // in the bin table, so create a new item
-    //FIXME check if there is room
     pibs->next_item++;
+    if (pibs->next_item > pibs->max_item) {
+        printf("FIXME run out of memory. Do something better than abort\n");
+        abort();
+    }
     if (pibs->bin_table[idx] == 0) {
         pibs->bin_table[idx] = pibs->next_item;
     }
@@ -235,6 +239,7 @@ pibs_t* init(void)
 
     wtap_init();
     pibs=calloc(sizeof(pibs_t),1);
+    //TODO check if size is correct
     pibs->data_size = sizeof(pibs_header_t) + NBINSCALE * NBINS * SZBIN * NBINITEMS * sizeof(item_t);
     pibs->data = calloc(pibs->data_size,1);
     pibs->filename = calloc(FILENAME_MAX,1);
@@ -256,6 +261,8 @@ pibs_t* init(void)
     pibs->items = (item_t*)(pibs->data+pibs->next_block);
     pibs->next_item = 0;
     printf("items are address %p\n", pibs->items);
+    pibs->max_item = NBINS * NBINITEMS;
+    printf("max_item: %d\n", pibs->max_item);
     return pibs;
 }
 
