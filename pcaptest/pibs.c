@@ -32,6 +32,9 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
 #include <hiredis/hiredis.h>
 
 //TODO test other values
@@ -68,6 +71,7 @@ typedef struct pibs_s {
     int should_dump_table;
     int show_backscatter;
     int show_stats;
+    int should_create_shm;
     //TODO use self contained data structure that can be easily serialized
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
@@ -318,7 +322,7 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
-    while ((opt = getopt(argc, argv, "r:dbs")) != -1) {
+    while ((opt = getopt(argc, argv, "r:dbsn")) != -1) {
         switch (opt) {
             case 'r':
                 strncpy(pibs->filename, optarg, FILENAME_MAX);
@@ -332,9 +336,16 @@ int main(int argc, char* argv[])
             case 's':
                 pibs->show_stats = 1;
                 break;
+            case 'n':
+                pibs->should_create_shm = 1;
+                break;
+
             default: /* '?' */
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
         }
+    }
+    if (pibs->should_create_shm) {
+        printf("Create a new shared memory segment\n");
     }
     if (pibs->filename[0]) {
         process_file(pibs);
