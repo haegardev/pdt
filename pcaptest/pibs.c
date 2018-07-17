@@ -34,6 +34,7 @@
 #include <sys/socket.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <errno.h>
 
 #include <hiredis/hiredis.h>
 
@@ -66,7 +67,7 @@ typedef struct item_s {
 
 /* Need to hash source IP addresses and record first seen and flags */
 typedef struct pibs_s {
-    int errno;
+    int errno_copy;
     char *filename;
     int should_dump_table;
     int show_backscatter;
@@ -82,7 +83,30 @@ typedef struct pibs_s {
     uint32_t* bin_table;
     uint32_t max_item;
     item_t* items;
+    int shmid;
+    char shmid_file [FILENAME_MAX];
 } pibs_t;
+
+
+int pibs_shmget(pibs_t* pibs)
+{
+    FILE* fp;
+    pibs->shmid = shmget(IPC_PRIVATE, pibs->data_size, IPC_CREAT |  0600);
+    if (pibs->shmid < 0) {
+        pibs->errno_copy = errno;
+    }
+
+    if (pibs->shmid_file[0]){
+            fp = fopen(pibs->shmid_file, "w");
+            if (fp) {
+                fprintf(fp,"%d",pibs->shmid);
+                fclose(fp);
+            }
+            //TODO error handling
+    }
+
+    return pibs->shmid;
+}
 
 /*
  * Returns -1 if not found
@@ -345,7 +369,13 @@ int main(int argc, char* argv[])
         }
     }
     if (pibs->should_create_shm) {
-        printf("Create a new shared memory segment\n");
+        pibs_shmget(pibs);
+        if (pibs->shmid >0){
+            printf("Create a new shared memory segment %d\n", pibs->shmid);
+        } else {
+            printf("Failed to get shared memory segment. Cause = %s\n",
+                    strerror(pibs->errno_copy));
+        }
     }
     if (pibs->filename[0]) {
         process_file(pibs);
