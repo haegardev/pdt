@@ -107,6 +107,38 @@ int load_shmid_file(pibs_t* pibs)
     return -1;
 }
 
+int pibs_shmat(pibs_t* pibs)
+{
+    /* FIXME  init function needs to break up in two functions. One that
+     *       initializes internal pibs structures as cli options etc
+     *       a second one for describing the data itself, size of bin_table
+     *       number of items etc.
+     */
+    if (pibs->data) {
+        free(pibs->data);
+        pibs->data = NULL;
+    }
+    if (pibs->data) {
+        pibs->errno_pibs =  ERR_ATTACH_NOT_EMPTY;
+        printf("TEST Data is not null\n");
+        return -1;
+    }
+    if (!pibs->shmid_file[0]) {
+        pibs->errno_pibs = ERR_NO_SHMID_FILE;
+        return -1;
+    }
+    if (load_shmid_file(pibs) > 0) {
+            pibs->data = shmat(pibs->shmid, NULL, SHM_RND);
+        if ( (int) pibs->data == -1) {
+            pibs->errno_copy = errno;
+        } else {
+            return 1;
+        }
+    }
+    // Something did not work
+    return -1;
+}
+
 int pibs_shmget(pibs_t* pibs)
 {
     FILE* fp;
