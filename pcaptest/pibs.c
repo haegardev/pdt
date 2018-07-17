@@ -346,7 +346,7 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
-    while ((opt = getopt(argc, argv, "r:dbsn")) != -1) {
+    while ((opt = getopt(argc, argv, "r:dbsni:")) != -1) {
         switch (opt) {
             case 'r':
                 strncpy(pibs->filename, optarg, FILENAME_MAX);
@@ -362,6 +362,9 @@ int main(int argc, char* argv[])
                 break;
             case 'n':
                 pibs->should_create_shm = 1;
+                break;
+            case 'i':
+                strncpy(pibs->shmid_file, optarg, FILENAME_MAX);
                 break;
 
             default: /* '?' */
