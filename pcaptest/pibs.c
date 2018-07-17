@@ -46,6 +46,9 @@
 
 #define HDBG(...) if (HASHDEBUG) fprintf(stderr, __VA_ARGS__)
 
+#define ERR_ATTACH_NOT_EMPTY 11
+#define ERR_NO_SHMID_FILE 12
+
 typedef struct pibs_header_s {
     uint8_t magic [4];
     uint8_t version;
@@ -68,6 +71,7 @@ typedef struct item_s {
 /* Need to hash source IP addresses and record first seen and flags */
 typedef struct pibs_s {
     int errno_copy;
+    int errno_pibs;
     char *filename;
     int should_dump_table;
     int show_backscatter;
