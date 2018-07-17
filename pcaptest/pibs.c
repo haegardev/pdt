@@ -108,6 +108,8 @@ int load_shmid_file(pibs_t* pibs)
     return -1;
 }
 
+//TODO when attaching the next_item  must be recovered if results
+//of previous runs need to be increased
 int pibs_shmat(pibs_t* pibs)
 {
     /* FIXME  init function needs to break up in two functions. One that
@@ -156,7 +158,8 @@ int pibs_shmget(pibs_t* pibs)
             }
             //TODO error handling
     }
-
+    //TODO attach to it and bzero it
+    //setup the tables
     return pibs->shmid;
 }
 
