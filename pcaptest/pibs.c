@@ -77,6 +77,7 @@ typedef struct pibs_s {
     int show_backscatter;
     int show_stats;
     int should_create_shm;
+    int should_attach;
     //TODO use self contained data structure that can be easily serialized
     //Put data structure in an entire block to easier serialize
     uint8_t *data;
@@ -397,7 +398,7 @@ int main(int argc, char* argv[])
 
     fprintf(stderr, "[INFO] pid = %d\n",(int)getpid());
 
-    while ((opt = getopt(argc, argv, "r:dbsni:")) != -1) {
+    while ((opt = getopt(argc, argv, "r:dbsni:a")) != -1) {
         switch (opt) {
             case 'r':
                 strncpy(pibs->filename, optarg, FILENAME_MAX);
@@ -417,8 +418,12 @@ int main(int argc, char* argv[])
             case 'i':
                 strncpy(pibs->shmid_file, optarg, FILENAME_MAX);
                 break;
+            case 'a':
+                pibs->should_attach = 1;
+                break;
 
             default: /* '?' */
+
                 fprintf(stderr, "[ERROR] Invalid command line was specified\n");
         }
     }
@@ -429,6 +434,15 @@ int main(int argc, char* argv[])
         } else {
             printf("Failed to get shared memory segment. Cause = %s\n",
                     strerror(pibs->errno_copy));
+        }
+    }
+    if (pibs->should_attach) {
+        if (pibs_shmat(pibs) > 0 ) {
+            printf("Attached to shared memory segment %d\n", pibs->shmid);
+        } else {
+            printf("Failed to attach to shared memory segment. System error:%s\n",
+                    strerror(pibs->errno_copy));
+            return EXIT_FAILURE;
         }
     }
     if (pibs->filename[0]) {
