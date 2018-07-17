@@ -91,6 +91,21 @@ typedef struct pibs_s {
     char shmid_file [FILENAME_MAX];
 } pibs_t;
 
+int load_shmid_file(pibs_t* pibs)
+{
+    FILE* fp;
+    if (pibs->shmid_file[0]) {
+        fp = fopen(pibs->shmid_file,"r");
+        if (fp) {
+            //FIXME check file
+            fscanf(fp, "%d", &pibs->shmid);
+            return pibs->shmid;
+        }
+    } else {
+        pibs->errno_pibs = ERR_NO_SHMID_FILE;
+    }
+    return -1;
+}
 
 int pibs_shmget(pibs_t* pibs)
 {
