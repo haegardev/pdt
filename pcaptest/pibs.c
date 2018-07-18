@@ -53,6 +53,10 @@ typedef struct pibs_header_s {
     uint8_t magic [4];
     uint8_t version;
     //Put some useful stuff here
+    uint32_t next_item;
+    uint32_t bin_offset;
+    uint64_t data_size;
+    uint32_t max_item;
     uint8_t padding [3];
 } pibs_header_t;
 
