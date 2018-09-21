@@ -21,6 +21,7 @@
 NAME=$1
 
 declare -a programs=("mkpasswd")
+declare -a directories=("exports" "cveexport" "bin")
 
 #Test if necessary programs are installed
 for i in "${programs[@]}"; do
@@ -42,7 +43,9 @@ if [  `id -u` != 0 ]; then
 fi
 
 ROOT="/home/$NAME"
+DOC="$ROOT/install.txt"
 
+#Create user if not exists
 if [ ! -d $ROOT ]; then
     SALT=`head -c 8 /dev/urandom  | sha1sum  | cut -d ' ' -f1`
     PASSWD=`mkpasswd $SALT`
@@ -51,4 +54,10 @@ if [ ! -d $ROOT ]; then
         echo "User creation failed. Abort." >&2
         exit 1
     fi
+    echo "Installation notes" >> $DOC
+    echo "==================" >> $DOC
+    echo "Installed on: `date +%Y%m%d%H%M`" >>$DOC
+    echo "Username: $NAME" >> $DOC
+    echo "Password: $PASSWD" >>$DOC
 fi
+#Create directory
