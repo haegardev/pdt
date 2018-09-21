@@ -19,9 +19,10 @@
 #
 
 NAME=$1
+REDISURL="http://download.redis.io/releases/redis-4.0.11.tar.gz"
 
 declare -a programs=("mkpasswd")
-declare -a directories=("exports" "cveexport" "bin" "etc" "current_pcaps" "databases" "var/pids")
+declare -a directories=("exports" "cveexport" "bin" "etc" "current_pcaps" "databases" "var/pids" "build")
 
 
 
@@ -70,3 +71,20 @@ for i in "${directories[@]}"; do
         chown $NAME:$NAME $d
     fi
 done
+
+#Check if redis is there
+if [ ! -e "$ROOT/bin/redis-server" ]; then
+    wget $REDISURL -o "$ROOT/build/redis.tar.gz"
+    if [ $? -ne 0 ]; then
+        echo "Could not download redis. Abort."
+        exit 1
+    fi
+    chown $NAME:$NAME "$ROOT/build/redis.tar.gz"
+    #Build redis
+    cd $ROOT/$build
+    make
+    if [ $? -ne 0 ]; then
+        echo "Could not build redis. Abort." >&2
+        exit 1
+    fi
+fi
