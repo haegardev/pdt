@@ -21,7 +21,9 @@
 NAME=$1
 
 declare -a programs=("mkpasswd")
-declare -a directories=("exports" "cveexport" "bin")
+declare -a directories=("exports" "cveexport" "bin" "etc" "current_pcaps" "databases" "var/pids")
+
+
 
 #Test if necessary programs are installed
 for i in "${programs[@]}"; do
@@ -61,3 +63,10 @@ if [ ! -d $ROOT ]; then
     echo "Password: $PASSWD" >>$DOC
 fi
 #Create directory
+for i in "${directories[@]}"; do
+    d="$ROOT/$i"
+    if [ ! -d "$d" ]; then
+        mkdir -p "$d"
+        chown $NAME:$NAME $d
+    fi
+done
