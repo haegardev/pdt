@@ -81,10 +81,10 @@ if [ ! -e "$ROOT/bin/redis-server" ]; then
     fi
     chown $NAME:$NAME "$ROOT/build/redis.tar.gz"
     #Build redis
-    cd $ROOT/$build
-    make
+    cd "$ROOT/build"
+    tar -zxf "$ROOT/build/redis.tar.gz"
     if [ $? -ne 0 ]; then
-        echo "Could not build redis. Abort." >&2
+        echo "Could extract redis. Abort." >&2
         exit 1
     fi
 fi
