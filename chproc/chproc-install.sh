@@ -20,6 +20,17 @@
 
 NAME=$1
 
+declare -a programs=("mkpasswd")
+
+#Test if necessary programs are installed
+for i in "${programs[@]}"; do
+    if [ -z "`which $i`" ]; then
+        echo "Necessary program $i not found. Do nothing." >&2
+        exit 1
+    fi
+done
+
+
 if [ -z "$NAME" ]; then
     echo "A name must be specified. Do noththing." >&2
     exit 1
@@ -30,4 +41,14 @@ if [  `id -u` != 0 ]; then
     exit 1
 fi
 
+ROOT="/home/$NAME"
 
+if [ ! -d $ROOT ]; then
+    SALT=`head -c 8 /dev/urandom  | sha1sum  | cut -d ' ' -f1`
+    PASSWD=`mkpasswd $SALT`
+    useradd -m -p $PASSWD -s /bin/bash $NAME
+    if [ $? -ne 0 ]; then
+        echo "User creation failed. Abort." >&2
+        exit 1
+    fi
+fi
