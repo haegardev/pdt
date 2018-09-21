@@ -87,4 +87,26 @@ if [ ! -e "$ROOT/bin/redis-server" ]; then
         echo "Could extract redis. Abort." >&2
         exit 1
     fi
+    #Use the first directpory and hope it is the good one
+    for d in `ls "$ROOT/build/"`; do
+        if [ -d "$d" ]; then
+            REDDIR="$ROOT/build/$d"
+            cd "$REDDIR"
+            make
+            if [ $? -ne 0 ]; then
+                echo "Redis build failed.abort." >&2
+                exit 1
+            fi
+            cp "$REDDIR/src/redis-cli" "$ROOT/bin"
+            if [ $? -ne 0 ]; then
+                echo "Redis client was not found" >&2
+                exit 1
+            fi
+            cp "$REDDIR/src/redis-server" "$ROOT/bin"
+            if [ $? -ne 0 ]; then
+                echo "Redis-server was not found" >&2
+                exit 1
+            fi
+        fi
+    done
 fi
