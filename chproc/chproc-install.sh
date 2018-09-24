@@ -19,11 +19,17 @@
 #
 
 NAME=$1
-PORT=$2
+HOST=$2
+PORT=$3
 REDISURL="http://download.redis.io/releases/redis-4.0.11.tar.gz"
 
 if [ -z $PORT ]; then
     echo "A port for the redis server should be configured."
+    exit 1
+fi
+
+if [ -z "$HOST" ]; then
+    echo "A host where redis listens should be configured,"  >&2
     exit 1
 fi
 
@@ -80,7 +86,7 @@ done
 
 #Check if redis is there
 if [ ! -e "$ROOT/bin/redis-server" ]; then
-    wget $REDISURL -O "$ROOT/build/redis.tar.gz"
+    #wget $REDISURL -O "$ROOT/build/redis.tar.gz"
     if [ $? -ne 0 ]; then
         echo "Could not download redis. Abort."
         exit 1
@@ -119,5 +125,10 @@ if [ ! -e "$ROOT/bin/redis-server" ]; then
     cat $REDDIR/redis.conf | sed "s/^port 6379/port 1234/g" \
     | sed "s/^save /#save/g"\
     | sed "s#^dir ./#dir $ROOT/databases#g"\
+    | sed "s/^bind 127.0.0.1/bind $HOST/g"\
+    | sed "s/^daemonize no/daemonize yes/g"\
+    | sed "s#pidfile /var/run/redis_6379.pid#pidfile $ROOT/var/pids/redis.pid#g"\
+    | sed "s/# syslog-enabled no/syslog-enabled yes/g"\
     > $ROOT/etc/redis.conf
+    chown $NAME:$NAME "$ROOT/etc/redis.conf"
 fi
