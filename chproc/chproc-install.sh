@@ -86,7 +86,7 @@ done
 
 #Check if redis is there
 if [ ! -e "$ROOT/bin/redis-server" ]; then
-    #wget $REDISURL -O "$ROOT/build/redis.tar.gz"
+    wget $REDISURL -O "$ROOT/build/redis.tar.gz"
     if [ $? -ne 0 ]; then
         echo "Could not download redis. Abort."
         exit 1
