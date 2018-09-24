@@ -45,7 +45,7 @@ if [ -e "$PIDFILE" ]; then
     exit 1
 fi
 
+#Record pid file to avoid concurrent processing
 echo $$ > $PIDFILE
 rm $PIDFILE
-#Record pid file to avoid concurrent processing
 
