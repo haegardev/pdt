@@ -131,4 +131,10 @@ if [ ! -e "$ROOT/bin/redis-server" ]; then
     | sed "s/# syslog-enabled no/syslog-enabled yes/g"\
     > $ROOT/etc/redis.conf
     chown $NAME:$NAME "$ROOT/etc/redis.conf"
+    #Try to start redis
+    sudo -u $NAME $ROOT/bin/redis-server $ROOT/etc/redis.conf
+    if [ $? -ne 0 ]; then
+        echo "Failed to start redis" >&2
+        exit 1
+    fi
 fi
