@@ -24,7 +24,7 @@ NAME="$ROOT/chproc-extract.sh"
 PIDFILE="$ROOT/var/pids/chproc-extract.pid"
 
 declare -a directories=("exports" "cveexport" "bin" "etc" "current_pcaps" "var/pids")
-
+declare -a programs=("tcprewrite" "tshark")
 
 if [ -z "$ROOT" ]; then
     logger -t $NAME "No root directory was executed."
@@ -39,6 +39,13 @@ for i in "${directories[@]}"; do
     fi
 done
 
+#Check if mandatory programs are there
+for i in "${programs[@]}"; do
+    if [ -z "`which $i`" ]; then
+        echo "Necessary program $i not found. Do nothing." >&2
+        exit 1
+    fi
+done
 
 if [ -e "$PIDFILE" ]; then
     logger -t $NAME "Annother instance is running, abort"
