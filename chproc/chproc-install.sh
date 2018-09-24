@@ -24,7 +24,7 @@ PORT=$3
 REDISURL="http://download.redis.io/releases/redis-4.0.11.tar.gz"
 
 if [ -z $PORT ]; then
-    echo "A port for the redis server should be configured."
+    echo "A port for the redis server should be configured." >&2
     exit 1
 fi
 
