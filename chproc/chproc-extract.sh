@@ -86,6 +86,7 @@ done
 
 #Go through the queue and preprocess the files
 
+TOPROC="$ROOT/var/toprocess.$$"
 while [ 1 ]; do
     FILENAME="`$ROOT/bin/redis-cli -p $PORT -h $HOST lpop $FILEQUEUE`"
     if [ -z "$FILENAME" ]; then
@@ -95,6 +96,8 @@ while [ 1 ]; do
         logger -t $NAME "$FILENAME was not found"
         continue
     fi
+    #Store lists in temporary file for processing them with  gnu parallel
+    echo $FILENAME >> $TOPROC
 done
 
 rm $PIDFILE
