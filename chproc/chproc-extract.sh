@@ -19,15 +19,36 @@
 #
 
 ROOT=$1
+HOST=$2
+PORT=$3
+FILEQUEUE=$4
+
 NAME="$ROOT/chproc-extract.sh"
 
 PIDFILE="$ROOT/var/pids/chproc-extract.pid"
 
 declare -a directories=("exports" "cveexport" "bin" "etc" "current_pcaps" "var/pids")
 declare -a programs=("tcprewrite" "tshark")
+declare -a cprograms=("$ROOT/bin/redis-cli")
+
 
 if [ -z "$ROOT" ]; then
     logger -t $NAME "No root directory was executed."
+    exit 1
+fi
+
+if [ -z "$HOST" ]; then
+    logger -t $NAME "A redis host must be specified."
+    exit 1
+fi
+
+if [ -z "$PORT" ]; then
+    logger -t $NAME "A port must be configured."
+    exit 1
+fi
+
+if [ -z "$FILEQUEUE" ]; then
+    logger -t $NAME "A queue must be configured."
     exit 1
 fi
 
@@ -54,5 +75,27 @@ fi
 
 #Record pid file to avoid concurrent processing
 echo $$ > $PIDFILE
+
+#Check if custom programs are there
+for i in "${cprograms[@]}"; do
+    if [ ! -e $i ]; then
+        logger -t $NAME  "Custom program: $i not found.Abort."
+        exit 1
+    fi
+done
+
+#Go through the queue and preprocess the files
+
+while [ 1 ]; do
+    FILENAME="`$ROOT/bin/redis-cli -p $PORT -h $HOST lpop $FILEQUEUE`"
+    if [ -z "$FILENAME" ]; then
+        break
+    fi
+    if [ ! -e $FILENAME ]; then
+        logger -t $NAME "$FILENAME was not found"
+        continue
+    fi
+done
+
 rm $PIDFILE
 
