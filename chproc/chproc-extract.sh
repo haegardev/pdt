@@ -97,6 +97,8 @@ while [ 1 ]; do
         continue
     fi
     #Store lists in temporary file for processing them with  gnu parallel
+    #TODO Process them in fixed size blocks instead of having one instance
+    #consuming the entire list
     echo $FILENAME >> $TOPROC
 done
 
