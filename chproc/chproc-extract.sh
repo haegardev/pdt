@@ -102,5 +102,7 @@ while [ 1 ]; do
     echo $FILENAME >> $TOPROC
 done
 
+#Process the lists
+#Use an external script as this is easier to test
 rm $PIDFILE
 
