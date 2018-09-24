@@ -99,7 +99,7 @@ if [ ! -e "$ROOT/bin/redis-server" ]; then
         echo "Could extract redis. Abort." >&2
         exit 1
     fi
-    #Use the first directpory and hope it is the good one
+    #Use the first directory and hope it is the good one
     for d in `ls "$ROOT/build/"`; do
         if [ -d "$d" ]; then
             REDDIR="$ROOT/build/$d"
