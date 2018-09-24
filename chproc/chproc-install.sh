@@ -19,7 +19,13 @@
 #
 
 NAME=$1
+PORT=$2
 REDISURL="http://download.redis.io/releases/redis-4.0.11.tar.gz"
+
+if [ -z $PORT ]; then
+    echo "A port for the redis server should be configured."
+    exit 1
+fi
 
 declare -a programs=("mkpasswd")
 declare -a directories=("exports" "cveexport" "bin" "etc" "current_pcaps" "databases" "var/pids" "build")
@@ -109,4 +115,9 @@ if [ ! -e "$ROOT/bin/redis-server" ]; then
             fi
         fi
     done
+    #Update configuration file
+    cat $REDDIR/redis.conf | sed "s/^port 6379/port 1234/g" \
+    | sed "s/^save /#save/g"\
+    | sed "s#^dir ./#dir $ROOT/databases#g"\
+    > $ROOT/etc/redis.conf
 fi
