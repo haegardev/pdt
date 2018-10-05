@@ -5,3 +5,6 @@ https://algs4.cs.princeton.edu/lectures/52Tries.pdf
 https://github.com/jmaslak/Net-Patricia
 https://github.com/syao92/Binary-Patricia-Trie/blob/master/src/solutions/BinaryPatriciaTrie.java
 https://github.com/torvalds/linux/blob/master/kernel/bpf/lpm_trie.c
+
+
+key points to patrica trie i.e. one trie per day, one per month, see intersections
