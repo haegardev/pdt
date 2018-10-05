@@ -4,3 +4,4 @@ https://github.com/antirez/rax/blob/master/rax.c
 https://algs4.cs.princeton.edu/lectures/52Tries.pdf
 https://github.com/jmaslak/Net-Patricia
 https://github.com/syao92/Binary-Patricia-Trie/blob/master/src/solutions/BinaryPatriciaTrie.java
+https://github.com/torvalds/linux/blob/master/kernel/bpf/lpm_trie.c
