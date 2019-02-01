@@ -326,7 +326,7 @@ pibs_t* init(void)
 {
     pibs_t *pibs;
 
-    wtap_init();
+    wtap_init(FALSE);
     pibs=calloc(sizeof(pibs_t),1);
     //TODO check if size is correct
     pibs->data_size = sizeof(pibs_header_t) + NBINSCALE * NBINS * SZBIN * NBINITEMS * sizeof(item_t);
