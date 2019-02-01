@@ -25,6 +25,7 @@
 #include <string.h>
 #include <pcap/pcap.h>
 #include <wtap.h>
+#include <wtap-int.h>
 #include <unistd.h>
 #include <signal.h>
 #include <netinet/ip.h>
@@ -292,7 +293,6 @@ void process_file(pibs_t* pibs)
     int err;
     char *errinfo;
     gint64 data_offset;
-    const struct wtap_pkthdr *phdr;
     int ethertype;
     guint8 *buf;
 
@@ -302,16 +302,19 @@ void process_file(pibs_t* pibs)
     if (wth) {
         /* Loop over the packets and adjust the headers */
         while (wtap_read(wth, &err, &errinfo, &data_offset)) {
-            phdr = wtap_phdr(wth);
-            buf = wtap_buf_ptr(wth);
-            if (phdr->caplen < 14) {
-                fprintf(stderr,"Packet too small, skip\n");
-                continue;
-            }
-            ethertype = buf[12] << 8 | buf[13];
-            // TODO Focus on IPv4 only
-            if (ethertype == 0x0800) {
-                process_frame(pibs, phdr,buf+14, phdr->caplen-14);
+            if (wth->rec.rec_type == REC_TYPE_PACKET) {
+                if (wth->rec.tsprec == WTAP_TSPREC_USEC){
+                    if (wth->rec.rec_header.packet_header.caplen < 14) {
+                        fprintf(stderr,"Packet too small, skip\n");
+                        continue;
+                    }
+                }
+                buf = wth->rec_data->data;
+                ethertype = buf[12] << 8 | buf[13];
+                // TODO Focus on IPv4 only
+                if (ethertype == 0x0800) {
+                    process_frame(pibs, wth, buf+14, wth->rec.rec_header.packet_header.caplen -14);
+                }
             }
         }
         wtap_close(wth);
