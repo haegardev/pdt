@@ -1,8 +1,8 @@
 /*
-* pcapdj - dispatch pcap files
+* pibs - identify backscatter traffic in pcap files
 *
-* Copyright (C) 2013 Gerard Wagener
-* Copyright (C) 2013 CIRCL Computer Incident Response Center Luxembourg 
+* Copyright (C) 2019 Gerard Wagener
+* Copyright (C) 2019 CIRCL Computer Incident Response Center Luxembourg
 * (SMILE gie).
 *
 * This program is free software: you can redistribute it and/or modify
