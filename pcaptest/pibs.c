@@ -243,7 +243,7 @@ void insert_ip(pibs_t* pibs, uint32_t ip, uint32_t ts)
     }
 }
 
-void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
+void process_frame(pibs_t* pibs, wtap *wth,
                    uint8_t *buf, size_t length)
 {
     struct ip* ipv4;
@@ -267,7 +267,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
     // Record only source ips where syn flag is set
     // TODO check other connection establishment alternatives
     if (tcp->th_flags  == 2 ){
-        insert_ip(pibs, ip, phdr->ts.secs);
+        insert_ip(pibs, ip, wth->rec.ts.secs);
         return;
     }
 
@@ -275,7 +275,7 @@ void process_frame(pibs_t* pibs, const struct wtap_pkthdr *phdr,
 
     if (lastseen > 0){
         HDBG("IP %x %s was already seen before at %ld. Time difference %ld.\n"
-               , ip, inet_ntoa(ipv4->ip_src), lastseen, phdr->ts.secs-lastseen);
+               , ip, inet_ntoa(ipv4->ip_src), lastseen, wth->rec.ts.secs-lastseen);
         return;
     }
     // TODO keep these IPs in a hashtable and rank them
